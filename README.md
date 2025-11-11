@@ -68,7 +68,6 @@ CARTALEX_FINAAAALLLLLLLLL 10-2/
 ├── Dockerfile                  # Application container definition
 ├── Dockerfile.raster           # Raster tile service container
 ├── config.py                   # Terracotta raster server configuration
-├── master_correction.sql       # ⚠️ CRITICAL: Database correction scripts for archaeological site FID mapping
 ├── swagger.yaml                # API documentation specification
 ├── package.json                # Node.js dependencies and scripts
 ├── webpack.config.js           # Frontend build configuration
@@ -81,7 +80,6 @@ CARTALEX_FINAAAALLLLLLLLL 10-2/
 - **`src/server/server.js`**: Express.js server with CORS, compression, and static file serving
 - **`src/js/app.js`**: Main frontend application managing map interactions and filters
 - **`tegola/tegola.toml`**: Configuration for vector tile generation from PostGIS data
-- **`master_correction.sql`**: ⚠️ **CRITICAL FILE** - Database correction scripts that maintain the essential FID (Feature ID) mapping between archaeological excavation sites and their bibliographic references. This file ensures data integrity for site identification and must be handled with extreme care during any database operations.
 - **`config.py`**: Terracotta configuration for raster tile serving
 
 ## Technologies Used
@@ -161,13 +159,7 @@ CARTALEX_FINAAAALLLLLLLLL 10-2/
    docker-compose up -d db
    ```
 
-3. **Initialize the database**
-   ```bash
-   # Run database initialization scripts
-   docker exec -i cartalex_db psql -U postgres -d cartalex_basileia_3857 < master_correction.sql
-   ```
-
-4. **Build and run the application**
+3. **Build and run the application**
    ```bash
    npm run build
    npm start
@@ -244,7 +236,6 @@ docker-compose up -d app
 3. **Database Schema Changes**
    ```bash
    # Create migration scripts
-   # Update master_correction.sql
    # Test with Docker database
    ```
 
@@ -281,9 +272,6 @@ curl http://localhost:7800/index.html
 # Connect to database
 docker exec -it cartalex_db psql -U postgres -d cartalex_basileia_3857
 
-***HOW TO RUN THE SCRIPT***  
-docker exec -i cartalex_db psql -U postgres -d cartalex_basileia_3857 < master_correction.sql
-
 
 # Run test queries
 SELECT COUNT(*) FROM sites_fouilles;
@@ -297,18 +285,6 @@ LEFT JOIN references_biblio rb ON d.id = rb.id_decouverte
 GROUP BY sf.fid, sf.num_tkaczow 
 ORDER BY sf.fid;
 ```
-
-### ⚠️ Critical File: master_correction.sql
-
-The `master_correction.sql` file is **extremely sensitive** and contains the core FID (Feature ID) mappings that link archaeological excavation sites to their bibliographic references. This file:
-
-- **Maintains data integrity** between sites and their associated documentation
-- **Contains 67+ INSERT statements** that establish critical relationships
-- **Must be backed up** before any modifications
-- **Requires careful testing** in development before production deployment
-- **Should never be modified** without thorough understanding of the archaeological data structure
-
-**⚠️ Warning**: Modifying this file incorrectly can break the entire site-to-bibliography mapping system, potentially causing data loss or incorrect site associations.
 
 ### Frontend Testing
 ```bash
@@ -366,13 +342,6 @@ ls -la dist/
    # Configure SSL certificates
    # Set up process management (PM2)
    ```
-
-### Cloud Deployment Options
-
-- **AWS**: Use ECS, RDS with PostGIS, and CloudFront
-- **Google Cloud**: Deploy with Cloud Run and Cloud SQL
-- **Azure**: Use Container Instances and Azure Database for PostgreSQL
-- **DigitalOcean**: Deploy with App Platform and managed databases
 
 ## Future Improvements / Roadmap
 
