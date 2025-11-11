@@ -405,7 +405,7 @@ This project is licensed under the **CE-Alex** - see the [package.json](package.
 
 - **Centre d'Études Alexandrines (CEALEX)**: [https://www.cealex.org/](https://www.cealex.org/)
 - **Email**: topo@cea.com.eg
-- **Repository**: [https://github.com/EzzEldinx/Cartalex-tiles]
+
 
 ## Acknowledgments
 
