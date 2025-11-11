@@ -379,7 +379,7 @@ This project is licensed under the **CE-Alex** - see the [package.json](package.
 ## Acknowledgments
 
 - **CEALEX Team**: For providing the archaeological data and domain expertise 
-  **Kamal Mohsen - Mustafa Morsi - Ezz ElDin** 
+  **Kamal Mohsen - Mustafa Morsi - Ezz ElDin Ahmed** 
 
 ---
 *Last updated: 2025-10*
