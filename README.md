@@ -38,7 +38,7 @@ Implementation overview
 ## Project Structure
 
 ```
-CARTALEX_FINAAAALLLLLLLLL 10-2/
+CARTALEX
 ├── src/                          # Source code directory  
 │   ├── server/                   # Backend server implementation
 │   │   ├── server.js            # Main Express server configuration
@@ -56,18 +56,13 @@ CARTALEX_FINAAAALLLLLLLLL 10-2/
 │   │   └── map.html            # Interactive map page
 │   ├── css/                     # Stylesheets
 │   │   ├── map.css             # Map-specific styles
-│   │   ├── mystyle.css         # Main application styles
-│   │   └── hover_effects.css   # Interactive element styles
+|
 │   └── img/                     # Static images and assets
 ├── public/                      # Public assets (32,000+ map images)
 ├── tegola/                      # Tegola tile server configuration
 │   └── tegola.toml             # Tile server settings
-├── postgres/                    # PostgreSQL database files
-├── geopackage/                  # GeoPackage data files
 ├── docker-compose.yml          # Multi-service Docker orchestration
 ├── Dockerfile                  # Application container definition
-├── Dockerfile.raster           # Raster tile service container
-├── config.py                   # Terracotta raster server configuration
 ├── swagger.yaml                # API documentation specification
 ├── package.json                # Node.js dependencies and scripts
 ├── webpack.config.js           # Frontend build configuration
@@ -80,7 +75,6 @@ CARTALEX_FINAAAALLLLLLLLL 10-2/
 - **`src/server/server.js`**: Express.js server with CORS, compression, and static file serving
 - **`src/js/app.js`**: Main frontend application managing map interactions and filters
 - **`tegola/tegola.toml`**: Configuration for vector tile generation from PostGIS data
-- **`config.py`**: Terracotta configuration for raster tile serving
 
 ## Technologies Used
 
@@ -123,7 +117,7 @@ CARTALEX_FINAAAALLLLLLLLL 10-2/
 1. **Clone the repository**
    ```bash
    git clone <https://github.com/EzzEldinx/Cartalex-tiles>
-   cd CARTALEX_FINAAAALLLLLLLLL\ 10-2
+   cd CARTALEX
    ```
 
 2. **Start all services**
@@ -368,7 +362,7 @@ ls -la dist/
 
 ## License
 
-This project is licensed under the **CE-Alex** - see the [package.json](package.json) file for details.
+This project is licensed under the **CE-Alex** - see the [package.json](package.json) file for details. 
 
 ## Contact & Support
 
