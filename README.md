@@ -39,34 +39,34 @@ Implementation overview
 
 ```
 CARTALEX
-├── src/                          # Source code directory  
-│   ├── server/                   # Backend server implementation
+├── src/                         # Source code directory  
+│   ├── server/                  # Backend server implementation
 │   │   ├── server.js            # Main Express server configuration
 │   │   ├── routes.js            # API route definitions
 │   │   ├── middleware.js        # Custom middleware and error handlers
-│   │   └── db.js               # Database connection and queries
+│   │   └── db.js                # Database connection and queries
 │   ├── js/                      # Frontend JavaScript modules
-│   │   ├── app.js              # Main application controller
-│   │   ├── FilterCollection.js # Filter management system
-│   │   ├── LayerCollection.js  # Map layer management
-│   │   ├── ui.js               # User interface components
-│   │   └── server_config.js    # API configuration
+│   │   ├── app.js               # Main application controller
+│   │   ├── FilterCollection.js  # Filter management system
+│   │   ├── LayerCollection.js   # Map layer management
+│   │   ├── ui.js                # User interface components
+│   │   └── server_config.js     # API configuration
 │   ├── html/                    # HTML templates
-│   │   ├── index.html          # Main landing page
-│   │   └── map.html            # Interactive map page
+│   │   ├── index.html           # Main landing page
+│   │   └── map.html             # Interactive map page
 │   ├── css/                     # Stylesheets
-│   │   ├── map.css             # Map-specific styles
+│   │   ├── map.css              # Map-specific styles
 |
 │   └── img/                     # Static images and assets
 ├── public/                      # Public assets (32,000+ map images)
 ├── tegola/                      # Tegola tile server configuration
-│   └── tegola.toml             # Tile server settings
-├── docker-compose.yml          # Multi-service Docker orchestration
-├── Dockerfile                  # Application container definition
-├── swagger.yaml                # API documentation specification
-├── package.json                # Node.js dependencies and scripts
-├── webpack.config.js           # Frontend build configuration
-└── webpack.server.config.js    # Server build configuration
+│   └── tegola.toml              # Tile server settings
+├── docker-compose.yml           # Multi-service Docker orchestration
+├── Dockerfile                   # Application container definition
+├── swagger.yaml                 # API documentation specification
+├── package.json                 # Node.js dependencies and scripts
+├── webpack.config.js            # Frontend build configuration
+└── webpack.server.config.js     # Server build configuration
 ```
 
 ### Key Files Explanation
