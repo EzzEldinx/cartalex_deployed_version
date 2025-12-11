@@ -5,16 +5,16 @@ services:
     image: postgis/postgis:13-3.1
     container_name: cartalex_db
     ports:
-      - "85.234.139.116:5432:5432"
+      - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=cartalex_basileia_3857
+      - POSTGRES_DB=cartalex
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d cartalex_basileia_3857"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cartalex"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -45,8 +45,8 @@ services:
     ports:
       - "7800:7800"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/cartalex_basileia_3857
-      - CORS_ORIGIN=*   # CORS fix
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/cartalex
+      - CORS_ORIGIN=* # CORS fix
     depends_on:
       db:
         condition: service_healthy
@@ -64,8 +64,8 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_PORT=5432
-      - DB_NAME=cartalex_basileia_3857
-      - CORS_ORIGIN=http://85.234.139.116
+      - DB_NAME=cartalex
+      - CORS_ORIGIN=http://localhost:3000
     volumes:
       - ./public:/usr/src/app/public  
     depends_on:

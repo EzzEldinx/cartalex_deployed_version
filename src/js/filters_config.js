@@ -62,19 +62,17 @@
                 name: 'bibliographies', // <-- ده الـ ID الداخلي (نسيبه)
                 displayName: 'Bibliographies', // <-- ده اسم العرض الجديد
                 infos: "Ce filtre permet de sélectionner les sites de fouilles d'après l'ouvrage dans lequel en apparaît \n \
-                une mention, ou bien selon l'auteur qui les évoque. Un site peut-être mentionné dans plusieurs bibliographies \
-                et une même bibliographie peut citer différents sites.",
+                une mention, ou bien selon l'auteur qui les évoque.",
                 sub_filters: [
                     {
-                        name: 'nom_document',
+                        name: 'Title',
                         request_options: {
-                            alias: 'Nom du document'
+                            alias: 'Titre du document'
                         }
                     },
                     {
-                        name: 'nom',
+                        name: 'Author',
                         request_options: {
-                            fromTable: 'personnes',
                             alias: 'Auteur'
                         }
                     }
@@ -83,4 +81,4 @@
         ]
     };
      
-    export const api_at = "http://85.234.139.116:3000";
+    export const api_at = "http://localhost:3000";

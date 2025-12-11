@@ -17,9 +17,7 @@ export class App {
         this.historicalMapIds = [
             "Plan d'Adriani, 1934",
             "Plan de Tkaczow, 1993",
-            "Restitution de Mahmoud bey el-Falaki, 1866",
-            "Plan de Tkaczow east",
-            "Plan de Tkaczow west"
+            "Restitution de Mahmoud bey el-Falaki, 1866"
         ];
         this.hoveredFid = null;
         this.distanceMeasure = null;
@@ -34,11 +32,17 @@ export class App {
             this.initLayerList();
             this.initEventListeners();
             this.initMapClickListener();
-            this.initDeepLinkHandlers(); // <-- This is now modified
+            this.initDeepLinkHandlers();
             this.initHoverEffect();
             this.initDistanceMeasure();
             // Apply default style initially
             this.applyHighlightStyle(undefined); // Call with undefined to set all to default
+
+            //this.map.jumpTo({
+            //    center: [29.9187, 31.2001], // Centered on Alexandria
+            //    zoom: 12 // Level 12 is "zoomed out" (Level 13-14 is street view)
+            //});
+
             console.log('Application initialized successfully.');
         } catch (error) {
             console.error("Failed to initialize the application:", error);
@@ -60,11 +64,8 @@ export class App {
         const desiredOrder = [
             'sites_fouilles-points',
             'emprises-fill',
-            'espaces_publics-fill',
             'littoral-line',
             'parcelles_region-fill',
-            'Plan de Tkaczow west',
-            'Plan de Tkaczow east',
             'Plan de Tkaczow, 1993',
             "Plan d'Adriani, 1934",
             'Restitution de Mahmoud bey el-Falaki, 1866',
@@ -102,68 +103,71 @@ export class App {
                 if (this.popup) { this.popup.remove(); }
                 const feature = siteFeatures[0];
                 const coordinates = feature.geometry.coordinates.slice();
-                // --- IMPORTANT CHANGE: Use feature.id directly as it comes from Tegola ---
-                const fid = feature.id; // Use feature.id directly
+                const fid = feature.id;
 
                 const lngStr = Number(coordinates[0]).toFixed(6);
                 const latStr = Number(coordinates[1]).toFixed(6);
                 const coordsStr = `${latStr}, ${lngStr}`;
                 this.copyToClipboard(coordsStr);
                 this.showCopyConfirmation(coordsStr);
-                this.flyToCoordinates(coordinates, { zoom: 18, duration: 2000 });
+                // Updated zoom level to 16
+                this.flyToCoordinates(coordinates, { zoom: 16, duration: 1000 });
                 const onMoveEnd = () => {
                     this.map.off('moveend', onMoveEnd);
-                    // Pass the correct fid (feature.id)
                     this.showPopupForSite(fid, coordinates);
                 };
                 this.map.on('moveend', onMoveEnd);
-                // Update URL with the correct fid (feature.id)
-                this.updateUrlForPoint(fid); // <-- This function is now modified
+                this.updateUrlForPoint(fid);
             } else {
+                // Clicking on background
                 const lng = e.lngLat.lng.toFixed(6);
                 const lat = e.lngLat.lat.toFixed(6);
                 const coords = `${lat}, ${lng}`;
                 this.copyToClipboard(coords);
                 this.showCopyConfirmation(coords);
+                
+                // --- UPDATED: Reset URL and close popup ---
+                if (this.popup) { 
+                    this.popup.remove(); 
+                    this.popup = null;
+                }
+                this.resetUrl();
             }
         });
         this.map.on('mouseenter', 'sites_fouilles-points', () => { this.map.getCanvas().style.cursor = 'pointer'; });
         this.map.on('mouseleave', 'sites_fouilles-points', () => { this.map.getCanvas().style.cursor = ''; });
     }
 
-    // --- START: MODIFIED FUNCTION FOR CLEAN URLS ---
     initDeepLinkHandlers() {
-        // Check for /carte/30 style URL on initial load
         const pathMatch = window.location.pathname.match(/\/carte\/(\d+)/);
         if (pathMatch && pathMatch[1]) {
-            const fid = pathMatch[1]; // Get FID from path
+            const fid = pathMatch[1];
             this.focusPointByFid(fid);
         }
 
-        // Handle browser back/forward buttons
         window.addEventListener('popstate', () => {
             const popPathMatch = window.location.pathname.match(/\/carte\/(\d+)/);
             if (popPathMatch && popPathMatch[1]) {
                 const fidPop = popPathMatch[1];
-                this.focusPointByFid(fidPop); // Focus point from path
+                this.focusPointByFid(fidPop);
             } else {
-                // If the path is just /carte, close any open popup
                 if (this.popup) { this.popup.remove(); this.popup = null; }
             }
         });
     }
-    // --- END: MODIFIED FUNCTION ---
 
-    // --- START: MODIFIED FUNCTION FOR CLEAN URLS ---
     updateUrlForPoint(fid) {
-        // Create a new URL using the path format, e.g., /carte/30
         const url = new URL(`${window.location.origin}/carte/${fid}`);
-        // Use pushState to update the URL without reloading
         window.history.pushState({}, '', url);
     }
-    // --- END: MODIFIED FUNCTION ---
 
-    flyToCoordinates(coordinates, { zoom = 18, duration = 2000 } = {}) {
+    // --- NEW METHOD: Resets URL to default ---
+    resetUrl() {
+        const url = new URL(`${window.location.origin}/carte`);
+        window.history.pushState({}, '', url);
+    }
+
+    flyToCoordinates(coordinates, { zoom = 16, duration = 1000 } = {}) {
         this.map.flyTo({
             center: coordinates,
             zoom,
@@ -173,17 +177,17 @@ export class App {
         });
     }
 
-    async focusPointByFid(fid) { // fid can be string or number
+    async focusPointByFid(fid) {
         try {
             const coords = await this.getCoordinatesForFid(fid);
             if (!coords) {
                 console.warn(`Could not find coordinates for fid: ${fid}`);
                 return;
             }
-            this.flyToCoordinates(coords, { zoom: 18, duration: 2000 });
+            this.flyToCoordinates(coords, { zoom: 16, duration: 1000 });
             const onMoveEnd = () => {
                 this.map.off('moveend', onMoveEnd);
-                this.showPopupForSite(fid, coords); // Pass original fid
+                this.showPopupForSite(fid, coords);
             };
             this.map.on('moveend', onMoveEnd);
         } catch (e) {
@@ -191,12 +195,11 @@ export class App {
         }
     }
 
-    async getCoordinatesForFid(targetFid) { // targetFid can be string or number
+    async getCoordinatesForFid(targetFid) {
         const tryFind = () => {
             const features = this.map.querySourceFeatures('tegola_points', { sourceLayer: 'sites_fouilles' }) || [];
             for (const f of features) {
-                // --- IMPORTANT CHANGE: Compare feature.id (can be string/number) with targetFid ---
-                if (String(f.id) === String(targetFid)) { // Compare as strings
+                if (String(f.id) === String(targetFid)) {
                     const c = f.geometry.coordinates;
                     return Array.isArray(c) ? c.slice() : null;
                 }
@@ -221,7 +224,6 @@ export class App {
     initHoverEffect() {
         this.map.on('mousemove', 'sites_fouilles-points', (e) => {
             if (e.features.length > 0) {
-                // --- IMPORTANT CHANGE: Use feature.id ---
                 const currentFid = e.features[0].id;
                 if (this.hoveredFid !== currentFid) {
                     if (this.hoveredFid !== null) {
@@ -256,7 +258,6 @@ export class App {
         let frame = 0;
         const animate = (timestamp) => {
             if (this.hoveredFid !== null) {
-                // --- IMPORTANT CHANGE: Filter using feature.id ---
                 const filter = ['==', ['id'], this.hoveredFid];
                 this.map.setFilter('sites_fouilles-pulse', filter);
                 this.map.setFilter('sites_fouilles-waves', filter);
@@ -268,8 +269,7 @@ export class App {
                 this.map.setPaintProperty('sites_fouilles-waves', 'circle-opacity', waveOpacity > 0 ? waveOpacity : 0);
                 frame += 0.3;
             } else {
-                // --- IMPORTANT CHANGE: Use correct null filter ---
-                const nullFilter = ['==', ['id'], '']; // Keep this way to effectively hide
+                const nullFilter = ['==', ['id'], ''];
                 this.map.setFilter('sites_fouilles-pulse', nullFilter);
                 this.map.setFilter('sites_fouilles-waves', nullFilter);
                 frame = 0;
@@ -279,63 +279,150 @@ export class App {
         animate(0);
     }
 
-    async showPopupForSite(fid, coordinates) { // fid can be string or number
+    // --- Helper Functions for Formatting ---
+
+    formatAuthors(authorString) {
+        if (!authorString) return '';
+        const authors = authorString.split(';');
+        const formattedAuthors = authors.map(auth => {
+            const parts = auth.split(',').map(s => s.trim());
+            if (parts.length >= 2) {
+                const lastname = parts[0];
+                const firstname = parts[1];
+                const initials = firstname.split(/[\s-]+/).map(n => n.charAt(0) + '.').join('-');
+                return `${initials}\u00A0${lastname}`; 
+            }
+            return parts[0];
+        });
+        return formattedAuthors.join(', ');
+    }
+
+    formatPages(pages) {
+        if (!pages) return '';
+        const isNumeric = /^[\d\s-]+$/.test(pages);
+        if (isNumeric) {
+            return `p.\u00A0${pages}`;
+        }
+        return pages;
+    }
+
+    async showPopupForSite(fid, coordinates) {
         try {
-            // Fetch using the fid (which is feature.id, potentially string or number)
             const response = await fetch(`${server_config.api_at}/sitesFouilles/${fid}/details`);
             if (!response.ok) {
-                console.error(`API Error for fid ${fid}: ${response.status} ${response.statusText}`);
-                const errorText = await response.text();
-                console.error("Error details:", errorText);
                 throw new Error(`API request failed for fid: ${fid}`);
             }
             const data = await response.json();
 
-            // Check if data.details exists before accessing properties
             const details = data.details || {};
-            const discoverer = details.inventeur || 'N/A';
-            const discoveryDate = details.date_decouverte || 'N/A';
-            const numTkaczow = details.num_tkaczow || 'N/A';
+            const tkaczow = details.num_tkaczow ? `Tkaczow\u00A0${details.num_tkaczow}` : '';
+            
+            // Discovery List
+            let discoveryHTML = '';
+            if (data.discoveries && data.discoveries.length > 0) {
+                discoveryHTML = `<ul style="margin: 5px 0; padding-left: 20px;">`;
+                data.discoveries.forEach(d => {
+                    const inventor = d.inventeur || 'Inconnu';
+                    let extra = [];
+                    if (d.date_decouverte) extra.push(d.date_decouverte);
+                    if (d.type_decouverte) extra.push(d.type_decouverte);
+                    const extraStr = extra.length > 0 ? ` (${extra.join(', ')})` : '';
+                    
+                    discoveryHTML += `<li>${inventor}${extraStr}</li>`;
+                });
+                discoveryHTML += `</ul>`;
+            } else {
+                discoveryHTML = `<p><em>Aucune découverte enregistrée</em></p>`;
+            }
 
-            const title = `<b>Fouilles ${discoverer} (${discoveryDate})</b><br>Num Tkaczow: ${numTkaczow}`;
-            let html = `<div class="site-popup"><h4>${title}</h4>`;
+            const titleHTML = `
+                <div class="popup-header-row">
+                    <span class="site-id">Site ${fid}</span>
+                    <span class="tkaczow-id">${tkaczow}</span>
+                </div>
+            `;
 
+            let html = `<div class="site-popup">
+                <h4>${titleHTML}</h4>
+                <div class="popup-content-body">
+                    ${details.labelFr ? `<p style="margin: 5px 0; font-weight: bold; color: #555;">${details.labelFr}</p>` : ''}
+                    <div class="discovery-section">
+                        <strong>Découvertes :</strong>
+                        ${discoveryHTML}
+                    </div>
+            `;
+
+            // Vestiges
             if (data.vestiges && data.vestiges.length > 0) {
-                html += `<strong>Vestiges:</strong><ul>`;
+                html += `<strong>Vestiges\u00A0:</strong><ul>`;
                 data.vestiges.forEach(v => {
-                    const caracterisation = v.caracterisation || 'N/A';
-                    const period = v.periode ? v.periode.split(' (')[0] : 'N/A';
-                    html += `<li>${caracterisation} (${period})</li>`;
+                    const caracterisation = v.caracterisation || '';
+                    const period = v.periode ? v.periode.split(' (')[0] : '';
+                    const periodDisplay = period ? ` (${period})` : '';
+                    html += `<li>${caracterisation}${periodDisplay}</li>`;
                 });
                 html += `</ul>`;
             }
 
+            // Bibliography
             if (data.bibliographies && data.bibliographies.length > 0) {
-                html += `<strong>Bibliographie sélective:</strong><ul>`;
+                html += `<strong>Bibliographie sélective\u00A0:</strong><ul>`;
                 data.bibliographies.forEach(b => {
-                    const author = b.auteur || 'N/A';
-                    const docTitle = b.nom_document ? `“${b.nom_document}”` : 'N/A';
-                    const year = b.annee || 'N/A';
-                    const page = b.pages || 'N/A';
-                    html += `<li>${author}, ${docTitle}, ${year}, p. ${page}.</li>`; // Added 'p.' for pages
+                    let citation = '';
+                    const author = this.formatAuthors(b.author);
+                    const date = b.date || '';
+                    const pages = this.formatPages(b.pages);
+                    const place = b.place || '';
+                    const publisher = b.publisher || '';
+                    const title = b.title || '';
+                    const pubTitle = b.publication_title || '';
+                    const vol = b.volume ? ` ${b.volume}` : '';
+                    const issue = b.issue ? `/${b.issue}` : '';
+                    const url = b.url ? `<a href="${b.url}" target="_blank" style="text-decoration:none; margin-left:4px;">&#8599;</a>` : '';
+
+                    switch (b.item_type) {
+                        case 'book':
+                        case 'report':
+                            citation = `${author}, <em>${title}</em>, ${place}, ${date}, ${pages}.`;
+                            break;
+                        case 'bookSection':
+                            citation = `${author}, «\u00A0${title}\u00A0», <em>${pubTitle}</em>, ${place}, ${date}, ${pages}.`;
+                            break;
+                        case 'journalArticle':
+                            citation = `${author}, «\u00A0${title}\u00A0», <em>${pubTitle}</em>${vol}${issue}, ${date}, ${pages}.`;
+                            break;
+                        case 'thesis':
+                            citation = `${author}, ${title}, thèse ${publisher}, ${place}, ${date}, ${pages}.`;
+                            break;
+                        case 'webpage':
+                        case 'blogPost':
+                            const access = b.access_date ? `, consulté le ${b.access_date}` : '';
+                            citation = `${author}, «\u00A0${title}\u00A0», <em>${pubTitle}</em>${access} à l'adresse ${b.url || ''}.`;
+                            break;
+                        default:
+                            citation = `${author}, ${title}, ${date}.`;
+                    }
+                    citation = citation.replace(/, ,/g, ',').replace(/, \./g, '.');
+                    html += `<li>${citation}${url}</li>`;
                 });
                 html += `</ul>`;
             }
 
-            // Add comment if available
-            if (details.commentaire) {
-                html += `<p><strong>Commentaire:</strong> ${details.commentaire}</p>`;
-            }
+            // URI Link
+            const uri = `https://data.cealex.org/sites/${fid}`;
+            html += `<p style="margin-top: 15px; font-size: 0.9em;">
+                URI <a href="${uri}" target="_blank">${uri}</a> 📄
+            </p>`;
 
-            html += `</div>`;
-            if (this.popup) { this.popup.remove(); } // Ensure only one popup
-            this.popup = new maplibregl.Popup({ closeOnClick: true, maxWidth: '300px' }) // Make popup wider
+            html += `</div></div>`;
+
+            if (this.popup) { this.popup.remove(); }
+            this.popup = new maplibregl.Popup({ closeOnClick: true, maxWidth: '450px' })
                 .setLngLat(coordinates)
                 .setHTML(html)
                 .addTo(this.map);
         } catch (error) {
             console.error("Error creating popup for fid:", fid, error);
-            // Optionally show a generic error message in the popup
             if (this.popup) { this.popup.remove(); }
             this.popup = new maplibregl.Popup()
                 .setLngLat(coordinates)
@@ -392,7 +479,6 @@ export class App {
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             }
         `;
-        // Make sure styles are copied from previous turn if needed
         document.head.appendChild(style);
     }
 
@@ -407,7 +493,6 @@ export class App {
     }
 
     setLayerOpacity(layerId, opacity) {
-        // ... (keep existing opacity logic)
         const layer = this.map.getLayer(layerId);
         if (!layer) {
             console.warn(`Attempted to set opacity on a non-existent layer: ${layerId}`);
@@ -422,37 +507,26 @@ export class App {
         }
     }
 
-    // --- NEW METHOD ---
-    /**
-     * Applies conditional styling to points based on filtered IDs.
-     * @param {Array<string|number>|undefined} filteredIds - Array of feature IDs matching filters, or undefined if no filters.
-     */
     applyHighlightStyle(filteredIds) {
         const layerId = 'sites_fouilles-points';
         let colorExpression;
 
         if (filteredIds === undefined || filteredIds === null) {
-            // No filters active, use default color for all
             colorExpression = defaultPointColor;
         } else if (filteredIds.length === 0) {
-            // Filters active, but result is empty. Use default color for all (effectively hiding via filter)
-            colorExpression = defaultPointColor; // Or keep default, filter handles visibility
+            colorExpression = defaultPointColor;
         }
         else {
-            // Filters active and have results. Apply conditional coloring.
-            // Ensure IDs in the literal array match the type expected by MapLibre (usually numbers or strings)
             const literalIds = filteredIds.map(id => {
-                // Attempt to convert to number if possible, otherwise keep as string
                 const numId = Number(id);
                 return isNaN(numId) ? String(id) : numId;
             });
 
             colorExpression = [
                 'case',
-                // --- IMPORTANT CHANGE: Use ['id'] to get feature ID ---
                 ['in', ['id'], ['literal', literalIds]],
-                highlightPointColor, // Color for filtered points
-                defaultPointColor // Default color for non-filtered points
+                highlightPointColor,
+                defaultPointColor
             ];
         }
 
@@ -460,40 +534,33 @@ export class App {
             this.map.setPaintProperty(layerId, 'circle-color', colorExpression);
         } catch (error) {
             console.error("Error setting paint property for highlighting:", error);
-            // Fallback to default color in case of error
             this.map.setPaintProperty(layerId, 'circle-color', defaultPointColor);
         }
     }
 
-    // --- MODIFIED METHOD ---
     async updateMapFilter() {
         const activeFilters = this.filterCollection.getActiveFilters();
-        let filteredIds; // Can be undefined, empty array, or array of IDs
+        let filteredIds;
 
         if (activeFilters.length === 0) {
-            filteredIds = undefined; // Indicate no filters are active
-            this.map.setFilter('sites_fouilles-points', null); // Show all points
+            filteredIds = undefined;
+            this.map.setFilter('sites_fouilles-points', null);
         } else {
-            // Fetch IDs based on the *intersection* of active filters
-            filteredIds = await this.filterCollection.getFilteredIds(); // Returns array (possibly empty)
+            filteredIds = await this.filterCollection.getFilteredIds();
 
             if (filteredIds && filteredIds.length > 0) {
-                // Ensure IDs match the type used in the vector tiles (number or string)
                 const literalIdsForFilter = filteredIds.map(id => {
                     const numId = Number(id);
                     return isNaN(numId) ? String(id) : numId;
                 });
-                // Filter visibility: only show points whose ID is in the intersection
                 const visibilityFilter = ['in', ['id'], ['literal', literalIdsForFilter]];
                 this.map.setFilter('sites_fouilles-points', visibilityFilter);
             } else {
-                // No points match the intersection, filter to show none
-                this.map.setFilter('sites_fouilles-points', ['in', ['id'], '']); // Effectively hides all
+                this.map.setFilter('sites_fouilles-points', ['in', ['id'], '']);
             }
         }
 
-        // Apply highlighting based on the intersection result
-        this.applyHighlightStyle(filteredIds); // Pass undefined, empty array, or array of IDs
+        this.applyHighlightStyle(filteredIds);
     }
 
     initDistanceMeasure() {

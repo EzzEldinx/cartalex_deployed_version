@@ -3,6 +3,10 @@ export function buildFilterUI(filters) {
   if (!container) return;
 
   let html = '<div class="filter-collection-content">';
+  
+  // Initialize a global counter to ensure unique IDs across all filters
+  let uniqueIdCounter = 0;
+
   for (const filterName in filters) {
     const filter = filters[filterName];
     html += `
@@ -11,7 +15,6 @@ export function buildFilterUI(filters) {
         <div class="subfilter-container">
     `;
     for (const subFilter of filter.getSubFilters()) {
-      // Use displayName for the title
       html += `
         <div class="subfilter-content-wrapper">
           <h4 class="subfilter-title" data-subfilter-name="${subFilter.name}">${subFilter.displayName}</h4>
@@ -38,11 +41,14 @@ export function buildFilterUI(filters) {
         subFilter.getValues().forEach(valueObj => {
           const internalValue = valueObj.internalValue;
           const displayValue = valueObj.displayValue;
-          const inputId = `${filter.name}-${subFilter.name}-${String(internalValue).replace(/\s+/g, '-')}`;
+          
+          // FIX: Use a unique counter for ID instead of the text value to prevent collisions
+          uniqueIdCounter++;
+          const inputId = `filter-checkbox-${uniqueIdCounter}`;
 
           html += `
             <li>
-              <input type="checkbox" id="${inputId}" name="${subFilter.name}" value="${internalValue}">
+              <input type="checkbox" id="${inputId}" name="${subFilter.name}" value="${internalValue.replace(/"/g, '&quot;')}">
               <label for="${inputId}">${displayValue}</label>
             </li>
           `;
@@ -52,7 +58,7 @@ export function buildFilterUI(filters) {
     }
     html += `</div></div>`;
   }
-  html += '</div><button class="close-panel-button">Fermer le volet</button>';
+  html += '</div>';
   container.innerHTML = html;
 }
 
@@ -63,21 +69,17 @@ export function buildLayerList(layers, map, historicalMapIds = []) {
   const hiddenLayerIds = ['sites_fouilles-pulse', 'sites_fouilles-waves'];
 
   const layerNameMap = {
-    'osm-background': 'OpenStreetMap - Humanitarian',
+    'osm-background': 'OpenStreetMap',
     'satellite-background': 'Google Earth',
     'parcelles_region-fill': 'Cadastre Alexandrin (Survey of Egypt, 1933-1948 / CEAlex)',
-    'espaces_publics-fill': "Espaces publics d'Alexandrie (CEAlex)",
-    'emprises-fill': 'Emprises des sites de fouilles (CEAlex)',
-    'noms_rues-labels': 'Noms de rues (CEAlex)',
-    'littoral-line': 'Littoral (CEAlex)',
-    'sites_fouilles-points': 'Découvertes archéologiques, quartier des Palais Royaux (CEAlex)',
+    'emprises-fill': 'Emprises des sites de fouilles CEAlex',
+    'littoral-line': 'Littoral dans les années 1960 (données CEAlex)',
+    'sites_fouilles-points': 'Découvertes archéologiques',
 
     // Fix capitalization for display
-    'Plan De Tkaczow west': 'Plan de Tkaczow west',
-    'Plan De Tkaczow east': 'Plan de Tkaczow east',
-    'Plan De Tkaczow, 1993': 'Plan de Tkaczow, 1993',
-    "Plan D'Adriani, 1934": "Plan d'Adriani, 1934",
-    "Restitution De Mahmoud bey el-Falaki, 1866": "Restitution de Mahmoud bey el-Falaki, 1866"
+    'Plan de Tkaczow, 1993': 'Plan de Tkaczow, 1993',
+    "Plan d'Adriani, 1934": "Plan d'Adriani, 1934",
+    "Restitution de Mahmoud bey el-Falaki, 1866": "Restitution de Mahmoud bey el-Falaki, 1866"
   };
 
   let html = '';
@@ -109,7 +111,7 @@ export function buildLayerList(layers, map, historicalMapIds = []) {
 export function attachAllEventListeners(filters, onFilterChangeCallback, onLayerToggleCallback, onOpacityChangeCallback) {
   const voletHaut = document.getElementById('volet_haut');
   const openFilterBtn = document.querySelector('.onglets_haut a.ouvrir');
-  const closeFilterBtn = voletHaut.querySelector('.close-panel-button');
+  const closeFilterBtn = document.querySelector('.onglets_haut a.fermer');
 
   if (voletHaut && openFilterBtn && closeFilterBtn) {
     openFilterBtn.addEventListener('click', (e) => { e.preventDefault(); voletHaut.classList.add('is-open'); });

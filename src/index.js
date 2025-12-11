@@ -14,37 +14,33 @@ const map = new maplibregl.Map({
                 type: 'raster', 
                 tiles: ['https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=ZNQWXcznKtXVNVM4MoQE'], 
                 tileSize: 512,
-                attribution: 'Carte des découvertes archéologiques dans le quartier des Palais Royaux, Alexandrie © CEAlex - © MapTiler © OpenStreetMap Contributors'
+                attribution: 'Carte des découvertes archéologiques dans les quartiers urbains d’Alexandrie ancienne © CEAlex - © MapTiler © OpenStreetMap Contributors'
             },
             
-            // --- START: MODIFIED SATELLITE SOURCE ---
+            // --- MODIFIED SATELLITE SOURCE ---
             satellite: { 
                 type: 'raster', 
                 tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], 
                 tileSize: 256, 
-                maxzoom: 19, // <-- This property fixes the "map data not available" issue
+                maxzoom: 19,
                 attribution: 'Tiles &copy; Esri' 
             },
-            // --- END: MODIFIED SATELLITE SOURCE ---
             
             // --- TEGOLA SOURCE (POINTS) ---
-            tegola_points: { type: 'vector', tiles: ['http://85.234.139.116:8080/maps/cartalex/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+            tegola_points: { type: 'vector', tiles: ['http://localhost:8080/maps/cartalex/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
 
             // --- PG_TILESERV SOURCES ---
-            pgts_parcelles_region: { type: 'vector', tiles: ['http://85.234.139.116:7800/public.parcelles_region/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
-            pgts_espaces_publics: { type: 'vector', tiles: ['http://85.234.139.116:7800/public.espaces_publics/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
-            pgts_emprises: { type: 'vector', tiles: ['http://85.234.139.116:7800/public.emprises/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
-            pgts_littoral: { type: 'vector', tiles: ['http://85.234.139.116:7800/public.littoral/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+            pgts_parcelles_region: { type: 'vector', tiles: ['http://localhost:7800/public.parcelles_region/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+            pgts_emprises: { type: 'vector', tiles: ['http://localhost:7800/public.emprises/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+            pgts_littoral: { type: 'vector', tiles: ['http://localhost:7800/public.littoral/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
 
             // --- HISTORICAL MAP SOURCES ---
             "plan-adriani": { type: "raster", tiles: ["/adriani/{z}/{x}/{y}.png"], tileSize: 256, attribution: "Plan d'Adriani, 1934" },
             "plan-tkaczow": { type: "raster", tiles: ["/tkaczow/{z}/{x}/{y}.png"], tileSize: 256, attribution: "Plan de Tkaczow, 1993" },
             "plan-falaky":  { type: "raster", tiles: ["/falaky/{z}/{x}/{y}.png"],  tileSize: 256, attribution: "Restitution de Mahmoud Bey el-Falaki, 1866" },
-            "plan-de-tkaczow-east": { type: "raster", tiles: ["/tkaczow east/{z}/{x}/{y}.png"], tileSize: 256, attribution: "Plan de Tkaczow east" },
-            "plan-de-tkaczow-west": { type: "raster", tiles: ["/tkaczow west/{z}/{x}/{y}.png"], tileSize: 256, attribution: "Plan de Tkaczow west" },
         },
         layers: [
-            // --- START: LAYER ORDER TO MATCH SCREENSHOT ---
+            // --- LAYER ORDER ---
 
             // --- 1. Base Maps ---
             { id: 'osm-background', type: 'raster', source: 'osm', layout: { 'visibility': 'visible' } },
@@ -54,8 +50,6 @@ const map = new maplibregl.Map({
             { id: "Plan d'Adriani, 1934", type: "raster", source: "plan-adriani", layout: { "visibility": "none" } },
             { id: "Plan de Tkaczow, 1993", type: "raster", source: "plan-tkaczow", layout: { "visibility": "none" } },
             { id: "Restitution de Mahmoud bey el-Falaki, 1866",  type: "raster", source: "plan-falaky",  layout: { "visibility": "none" } },
-            { id: "Plan de Tkaczow east", type: "raster", source: "plan-de-tkaczow-east", layout: { "visibility": "none" } },
-            { id: "Plan de Tkaczow west", type: "raster", source: "plan-de-tkaczow-west", layout: { "visibility": "none" } },
 
             // --- 3. Vector Data Layers ---
             // Emprises
@@ -74,24 +68,6 @@ const map = new maplibregl.Map({
                 'source-layer': 'public.emprises',
                 layout: { 'visibility': 'none' },
                 paint: { 'line-color': '#910FCD', 'line-width': 2.5 },
-                metadata: { 'filter-ui': 'ignore' }
-            },
-            // Espaces Publics
-            { 
-                id: 'espaces_publics-fill',  
-                type: 'fill', 
-                source: 'pgts_espaces_publics',  
-                'source-layer': 'public.espaces_publics',  
-                layout: { 'visibility': 'none' }, 
-                paint: { 'fill-color': 'rgba(255, 255, 255, 0.6)' } 
-            },
-            {
-                id: 'espaces_publics-line',
-                type: 'line',
-                source: 'pgts_espaces_publics',
-                'source-layer': 'public.espaces_publics',
-                layout: { 'visibility': 'none' },
-                paint: { 'line-color': '#4E98D7', 'line-width': 1 },
                 metadata: { 'filter-ui': 'ignore' }
             },
             // Littoral
@@ -149,7 +125,7 @@ const map = new maplibregl.Map({
         ]
     },
     center: [29.9187, 31.2001],
-    zoom: 14,
+    zoom: 13,
     attributionControl: false
 });
 

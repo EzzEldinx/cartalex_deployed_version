@@ -3,7 +3,8 @@ const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const HtmlWebPackPLugin = require('html-webpack-plugin');
 
-let htmlPageNames = ['index'];
+// --- CHANGED: Added 'zotero' to the list ---
+let htmlPageNames = ['index', 'zotero']; 
 let multipleHtmlPlugins = htmlPageNames.map(name => {
   return new HtmlWebPackPLugin({
     template: `./src/html/${name}.html`,

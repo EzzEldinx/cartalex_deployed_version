@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bibliographie - Cartalex</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Merriweather&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+  <style>
+    /* --- 1. GLOBAL PROJECT STYLES (From index.html) --- */
+    body {
+        margin: 0;
+        font-family: 'Open Sans', sans-serif;
+        background: #ffffff;
+        color: #333;
+    }
+
+    /* Header */
+    header {
+        background-color: white;
+        padding: 20px 40px;
+    }
+
+    .logo-title-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 130px; 
+    }
+
+    .logo-title-wrapper img {
+        height: 110px;
+        margin-bottom: 12px;
+    }
+
+    .site-title h1 {
+        font-family: "Raleway", Helvetica, Arial, sans-serif;
+        font-size: 1.2em;
+        letter-spacing: 1px;
+        margin: 0;
+        color: #000;
+        display: initial;
+        vertical-align: middle;
+        font-weight: 600;
+    }
+
+    .site-title p {
+        margin: 5px 0 0;
+        font-size: 1em;
+        color: #555;
+    }
+
+    /* Navigation */
+    nav {
+        background-color: #faf9f9;
+        text-align: center;
+        padding: 15px;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+    }
+
+    nav a {
+        color: rgb(12, 12, 12);
+        text-decoration: none;
+        margin: 0 20px;
+        font-size: 1.1em;
+        transition: color 0.3s;
+    }
+
+    nav a:hover {
+        color: rgb(65, 88, 208);
+    }
+
+    /* Main Container */
+    main {
+        padding: 40px 20px;
+        max-width: 1100px; /* Wider for bibliography */
+        margin: auto;
+        min-height: 600px;
+    }
+
+    /* Footer */
+    footer {
+        background:#faf9f9;
+        color: rgb(12, 12, 12);
+        text-align: center;
+        padding: 20px;
+        font-size: 0.9em;
+        border-top: 1px solid #eee;
+    }
+
+    footer a { color: #4b61f3; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media screen and (max-width: 768px) {
+        .logo-title-wrapper { margin-left: 20px; }
+        .logo-title-wrapper img { height: 80px; }
+        nav a { display: block; margin: 10px 0; }
+    }
+
+    /* --- 2. ZOTERO SPECIFIC STYLES --- */
+    
+    /* Filter Bar */
+    .filter-container {
+        margin-bottom: 30px;
+        position: relative;
+        max-width: 600px; /* Limit width */
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 10px 15px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        background: #fff;
+        appearance: none;
+        font-family: inherit;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .filter-arrow {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .section-label {
+        font-size: 14px;
+        font-weight: 700;
+        color: #555;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    /* Bibliography List */
+    .biblio-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .bib-item {
+        margin-bottom: 20px;
+        line-height: 1.6;
+        font-size: 15px;
+        color: #444;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #f5f5f5;
+        cursor: pointer; /* Indicate clickable */
+        transition: background-color 0.2s;
+        padding: 10px;
+        border-radius: 4px;
+    }
+
+    .bib-item:hover {
+        background-color: #f9f9f9;
+    }
+
+    /* Zotero HTML overrides */
+    .csl-entry {
+        padding-left: 0 !important; /* Reset indent for cleaner look */
+        text-indent: 0 !important;
+    }
+
+    .bib-item a { color: #0079c1; text-decoration: none; }
+    .bib-item a:hover { text-decoration: underline; }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 40px;
+        gap: 5px;
+    }
+
+    .page-link {
+        padding: 8px 12px;
+        cursor: pointer;
+        color: #333;
+        border: 1px solid #eee;
+        border-radius: 4px;
+    }
+
+    .page-link.active {
+        background-color: #333;
+        color: #fff;
+        border-color: #333;
+    }
+
+    .page-link:hover:not(.active) { background: #f0f0f0; }
+
+    /* Loading & Errors */
+    #loader { text-align: center; padding: 60px; color: #999; }
+
+    /* --- ADDED: Error State Styles --- */
+    .error-state {
+        text-align: center;
+        padding: 40px;
+        background-color: #fff5f5;
+        border: 1px solid #ffcccc;
+        border-radius: 4px;
+        color: #cc0000;
+    }
+
+    .retry-btn {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+
+    .retry-btn:hover {
+        background-color: #555;
+    }
+
+    .retry-btn i { margin-right: 5px; }
+
+
+    /* --- 3. SIDEBAR (Black Detail View) --- */
+    :root {
+        --detail-bg: #2b2b2b;
+        --detail-text: #e1e1e1;
+        --detail-label: #aaaaaa;
+        --detail-input-bg: #232323;
+        --detail-border: #444444;
+        --detail-header-bg: #333333;
+    }
+
+    .sidebar-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.3); z-index: 999; display: none; 
+    }
+
+    .sidebar {
+        position: fixed; top: 0; right: -500px; width: 450px; height: 100vh;
+        background-color: var(--detail-bg); color: var(--detail-text);
+        z-index: 1000; box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: flex; flex-direction: column; font-size: 12px;
+        font-family: 'Segoe UI', Tahoma, sans-serif; /* Keep sidebar technical font */
+    }
+    .sidebar.active { right: 0; }
+
+    /* Sidebar Internals */
+    .sidebar-tabs { display: flex; background: var(--detail-header-bg); border-bottom: 1px solid var(--detail-border); padding: 0 5px; }
+    .tab-btn { background: none; border: none; color: #888; padding: 10px 15px; font-size: 12px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab-btn.active { color: #eee; background-color: #444; border-bottom: 2px solid #aaa; }
+    
+    .sidebar-actions { padding: 5px 10px; display: flex; justify-content: flex-end; border-bottom: 1px solid var(--detail-border); }
+    .close-btn { background: none; border: none; color: #aaa; cursor: pointer; font-size: 16px; }
+    .close-btn:hover { color: white; }
+
+    .detail-content { flex: 1; overflow-y: auto; padding: 15px 0; }
+    
+    .field-row { display: flex; padding: 3px 15px; min-height: 20px; }
+    .field-label { flex: 0 0 100px; color: var(--detail-label); text-align: right; padding-right: 15px; font-size: 11px; }
+    .field-value { flex: 1; color: #eee; word-wrap: break-word; line-height: 1.4; user-select: text; }
+    .field-value a { color: #6ab0ff; text-decoration: none; }
+    
+    .divider { border-bottom: 1px solid var(--detail-border); margin: 10px 0; }
+    .abstract-container { padding: 10px 15px; }
+    .abstract-header { color: var(--detail-label); font-size: 11px; margin-bottom: 5px; }
+    .abstract-box { background: var(--detail-input-bg); border: 1px solid var(--detail-border); padding: 8px; color: #ccc; white-space: pre-wrap; }
+
+  </style>
+</head>
+<body>
+
+    <header>
+      <div class="logo-title-wrapper">
+        <a href="index.html"><img src="../img/logo.png" alt="CEALEX Logo"></a>
+        <div class="site-title">
+          <h1>CENTRE D'ÉTUDES ALEXANDRINES</h1>
+          <p>UAR 3134</p>
+        </div>
+      </div>
+    </header>
+
+    <nav>
+        <a href="index.html">Présentation</a>
+        <a href="https://www.cealex.org/le-cealex/" target="_blank">Le CEAlex</a>
+        <a href="/carte">Carte</a>
+        <a href="/bibliographie" style="color: rgb(65, 88, 208); font-weight: 600;">Bibliographie</a>
+    </nav>
+
+    <main>
+        <div class="filter-container">
+            <select id="collection-filter" class="filter-select" onchange="filterItems()">
+                <option value="top">Top Level</option>
+                <option value="all">All Items</option>
+                <option disabled>──────────</option>
+                </select>
+            <i class="fas fa-chevron-down filter-arrow"></i>
+        </div>
+
+        <div class="section-label" id="list-label">TOP LEVEL ITEMS</div>
+
+        <div id="loader"><i class="fas fa-circle-notch fa-spin fa-2x"></i></div>
+        
+        <div id="biblio-container" class="biblio-list"></div>
+
+        <div class="pagination" id="pagination" style="display:none;">
+            </div>
+    </main>
+
+    <footer>
+        <em>&copy; 2025 Centre d'Études Alexandrines – <a href="https://www.cealex.org/mentions-legales/" target="_blank">Mentions légales</a></em>
+    </footer>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-tabs">
+            <button class="tab-btn active">Info</button>
+            <button class="tab-btn">Notes</button>
+            <button class="tab-btn">Tags</button>
+            <button class="tab-btn">Related</button>
+        </div>
+        <div class="sidebar-actions">
+            <button class="close-btn" onclick="closeSidebar()" title="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="detail-content" id="detail-content">
+            </div>
+    </div>
+
+<script>
+let allItems = []; // Contains raw JSON items
+let currentPage = 1;
+const itemsPerPage = 15;
+
+// Initialize
+(async function() {
+    await loadCollections();
+    await loadItems('top');
+})();
+
+// 1. Load Collections
+async function loadCollections() {
+    try {
+        const res = await fetch("/zotero-collections");
+        const collections = await res.json();
+        const select = document.getElementById("collection-filter");
+
+        collections.forEach(col => {
+            const option = document.createElement("option");
+            option.value = col.key;
+            option.innerText = `- ${col.name} (${col.numItems})`;
+            select.appendChild(option);
+        });
+    } catch (e) {
+        console.error("Failed to load collections", e);
+    }
+}
+
+// 2. Load Items
+async function loadItems(collectionKey) {
+    const loader = document.getElementById("loader");
+    const container = document.getElementById("biblio-container");
+    const label = document.getElementById("list-label");
+    const pagination = document.getElementById("pagination");
+
+    container.innerHTML = "";
+    pagination.style.display = "none";
+    loader.style.display = "block";
+    allItems = [];
+
+    // Update Label
+    const select = document.getElementById("collection-filter");
+    const selectedText = select.options[select.selectedIndex].text;
+    label.innerText = selectedText.replace(/^\- /, '').toUpperCase();
+
+    try {
+        let apiQuery = `/zotero-api?collectionKey=${collectionKey}`;
+        const res = await fetch(apiQuery);
+        if(!res.ok) throw new Error(await res.text());
+        
+        const data = await res.json();
+        allItems = data; // These objects have .bib (HTML) and .data (Metadata)
+
+        loader.style.display = "none";
+        renderPage(1);
+        renderPagination();
+
+    } catch (e) {
+        console.error(e);
+        loader.style.display = 'none';
+        
+        // --- MODIFIED: Show User-Friendly Retry Button ---
+        container.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle fa-2x" style="margin-bottom:10px;"></i>
+                <h3>Unable to load bibliography</h3>
+                <p style="color:#666; font-size:13px; margin-bottom:20px;">
+                    The server might be busy or the request timed out. <br>
+                    Detailed Error: ${e.message || 'Unknown Error'}
+                </p>
+                <button class="retry-btn" onclick="loadItems('${collectionKey}')">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+        `;
+    }
+}
+
+function filterItems() {
+    const select = document.getElementById("collection-filter");
+    currentPage = 1;
+    loadItems(select.value);
+}
+
+// --- NEW FUNCTION: Process Citation HTML (Clickable Links & Clean OEB) ---
+function processCitation(bibHtml) {
+    // 1. Remove "OEB." or "OEB" specifically
+    let cleanHtml = bibHtml.replace(/\s?OEB\.?/g, "");
+
+    // 2. Linkify URLs
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cleanHtml;
+
+    const urlRegex = /(https?:\/\/[^\s<]+)/g;
+
+    function traverse(node) {
+        if (node.nodeType === 3) { // Text node
+            const text = node.nodeValue;
+            if (urlRegex.test(text)) {
+                const newHtml = text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
+                const span = document.createElement('span');
+                span.innerHTML = newHtml;
+                node.replaceWith(span);
+            }
+        } else if (node.nodeType === 1) { // Element node
+            if (node.tagName.toLowerCase() !== 'a') {
+                Array.from(node.childNodes).forEach(traverse);
+            }
+        }
+    }
+
+    Array.from(tempDiv.childNodes).forEach(traverse);
+    return tempDiv.innerHTML;
+}
+
+// 3. Render List
+function renderPage(page) {
+    currentPage = page;
+    const container = document.getElementById("biblio-container");
+    container.innerHTML = "";
+
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = allItems.slice(start, end);
+
+    if (pageItems.length === 0) {
+        container.innerHTML = '<div style="color:#777;">No items found.</div>';
+        return;
+    }
+
+    pageItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "bib-item";
+        
+        // Apply link processing here
+        div.innerHTML = processCitation(item.bib); 
+        
+        // Add click listener to open sidebar
+        div.onclick = (e) => {
+            // Prevent opening sidebar if clicking a link inside the bib
+            if (e.target.tagName === 'A') return;
+            openSidebar(item);
+        };
+        
+        container.appendChild(div);
+    });
+
+    updatePaginationUI();
+}
+
+// 4. Render Pagination
+function renderPagination() {
+    const container = document.getElementById("pagination");
+    const totalPages = Math.ceil(allItems.length / itemsPerPage);
+    if (totalPages <= 1) {
+        container.style.display = "none";
+        return;
+    }
+
+    container.style.display = "flex";
+    container.innerHTML = "";
+
+    const max = Math.min(totalPages, 5); // Show first 5 for simplicity
+
+    for (let i = 1; i <= max; i++) {
+        const btn = document.createElement("div");
+        btn.className = `page-link ${i === 1 ? 'active' : ''}`;
+        btn.innerText = i;
+        btn.onclick = () => { renderPage(i); updatePaginationUI(); };
+        container.appendChild(btn);
+    }
+}
+
+function updatePaginationUI() {
+    const btns = document.querySelectorAll(".page-link");
+    btns.forEach(b => {
+        b.classList.remove("active");
+        if(b.innerText == currentPage) b.classList.add("active");
+    });
+}
+
+// 5. Sidebar Logic
+const typeLabels = {
+    book: 'Book', bookSection: 'Book Section', journalArticle: 'Journal Article',
+    thesis: 'Thesis', report: 'Report', webpage: 'Webpage', blogPost: 'Blog Post',
+    presentation: 'Presentation', map: 'Map', conferencePaper: 'Conference Paper'
+};
+
+function openSidebar(fullItem) {
+    const data = fullItem.data;
+    const meta = fullItem.meta || {};
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const container = document.getElementById("detail-content");
+
+    const row = (label, value) => {
+        if (!value && value !== 0) return '';
+        return `<div class="field-row"><div class="field-label">${label}</div><div class="field-value">${value}</div></div>`;
+    };
+
+    let html = '';
+
+    // --- Top Section ---
+    html += row("Item Type", typeLabels[data.itemType] || data.itemType);
+    html += row("Title", `<strong>${data.title}</strong>`);
+
+    if (data.creators) {
+        data.creators.forEach(c => {
+            const name = c.name || `${c.lastName}, ${c.firstName}`;
+            const type = c.creatorType.charAt(0).toUpperCase() + c.creatorType.slice(1);
+            html += row(type, name);
+        });
+    }
+
+    // --- Source Fields ---
+    let pubLabel = "Publication";
+    if (data.itemType === 'bookSection' || data.itemType === 'conferencePaper') {
+        pubLabel = "Book Title";
+    }
+
+    html += row(pubLabel, data.publicationTitle);
+    html += row("Series", data.series);
+    html += row("Series Number", data.seriesNumber);
+    html += row("Volume", data.volume);
+    html += row("# of Volumes", data.numberOfVolumes);
+    html += row("Edition", data.edition);
+    html += row("Place", data.place);
+    html += row("Publisher", data.publisher);
+    html += row("Date", data.date);
+    html += row("Pages", data.pages);
+    html += row("Language", data.language);
+    html += row("ISBN", data.ISBN);
+    html += row("ISSN", data.ISSN);
+    html += row("Short Title", data.shortTitle);
+    
+    // Links & Access
+    if (data.url) html += row("URL", `<a href="${data.url}" target="_blank">${data.url}</a>`);
+    html += row("Accessed", data.accessDate);
+    
+    // Archive Info
+    html += row("Archive", data.archive);
+    html += row("Loc. in Archive", data.archiveLocation);
+    html += row("Library Catalog", data.libraryCatalog);
+    html += row("Call Number", data.callNumber);
+    
+    // Other
+    html += row("Rights", data.rights);
+    html += row("Extra", data.extra);
+
+    html += '<div class="divider"></div>';
+    
+    // --- System ---
+    html += row("Date Added", data.dateAdded);
+    if (meta.createdByUser) html += row("Added By", meta.createdByUser.username);
+
+    // --- Abstract ---
+    if (data.abstractNote) {
+        html += `<div class="abstract-container"><div class="abstract-header">ABSTRACT</div><div class="abstract-box">${data.abstractNote}</div></div>`;
+    }
+
+    container.innerHTML = html;
+    
+    overlay.style.display = "block";
+    setTimeout(() => { sidebar.classList.add("active"); }, 10);
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    sidebar.classList.remove("active");
+    setTimeout(() => { overlay.style.display = "none"; }, 300);
+}
+</script>
+
+</body>
+</html>

@@ -10,7 +10,7 @@ basepath = "/tmp/tegola_cache"
 [[providers]]
 name = "postgis_provider"
 type = "postgis"
-uri = "postgres://postgres:postgres@db:5432/cartalex_basileia_3857"
+uri = "postgres://postgres:postgres@db:5432/cartalex"
 
   [[providers.layers]]
   name = "sites_fouilles_data"

@@ -12,6 +12,7 @@
     --text-shadow-light: 1px 1px 2px rgba(0, 0, 0, 0.7);
     --close-button-bg: rgba(220, 53, 69, 0.9);
     --close-button-hover-bg: rgba(187, 45, 59, 0.9);
+    --accent: #95744b; /* Gold/Brown accent for distance tool */
   }
   
   html,
@@ -26,6 +27,25 @@
     top: 0;
     bottom: 0;
     width: 100%;
+  }
+
+  /* --- Logo Overlay --- */
+  .map-logo {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 10;
+    /* Removed pointer-events: none so it is clickable */
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
+    cursor: pointer;
+    text-decoration: none; /* Remove underline from link */
+  }
+
+  .map-logo img {
+    height: 90px; /* Adjusted size for visibility */
+    width: auto;
+    display: block; /* Removes extra space below image */
+    border: none;
   }
   
   /* =======================================
@@ -301,20 +321,53 @@
   .maplibregl-popup-content {
     background: #fff;
     color: var(--text-dark);
-    padding: 15px;
+    padding: 0; /* Remove default padding to allow header to stretch */
     border-radius: 4px;
     border: 1px solid var(--border-color);
     font-family: var(--font-main);
-    max-width: 300px;
+    max-width: 450px !important; /* Increase width for better readability */
+    max-height: 400px; /* Limit height as requested */
+    overflow-y: auto; /* Add vertical scrollbar */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
   
+  /* Popup Header Styling */
   .site-popup h4 {
-    margin: 0 0 10px;
-    color: var(--button-bg);
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
+    margin: 0;
+    color: var(--text-light);
+    background-color: var(--button-bg); /* Use button background color */
+    padding: 10px 15px;
     font-size: 1.1rem;
+    text-shadow: var(--text-shadow-light);
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .site-popup .popup-content-body {
+    padding: 15px;
+  }
+
+  .site-popup ul {
+    margin-top: 5px;
+    padding-left: 20px;
+  }
+
+  .site-popup li {
+    margin-bottom: 4px;
+  }
+
+  /* Specific styles for the header row */
+  .popup-header-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .tkaczow-id {
+    font-size: 0.9em;
+    opacity: 0.9;
   }
   
   /* =======================================
