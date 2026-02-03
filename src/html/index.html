@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <title class="notranslate">Cartalex - Centre d'Études Alexandrines</title>
+  <link class="" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Raleway:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+  /* --- 1. ANIMATION SETTINGS --- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  body {
+    top: 0px !important; margin: 0;
+    background-color: #f9f9f9; 
+    font-family: 'Open Sans', sans-serif;
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.8;
+  }
+  
+  html, body { height: 100%; }
+  .wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* --- 2. FIXED HEADER CONTAINER (Correction applied here) --- */
+  .fixed-header-container {
+    position: fixed; /* Force fixed positioning */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2000;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+  }
+
+  header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 15px 40px;
+  }
+
+  .logo-title-wrapper { display: flex; flex-direction: column; align-items: flex-start; margin-left: 130px; }
+  .logo-title-wrapper img { height: 100px; margin-bottom: 8px; transition: height 0.3s ease; }
+  .site-title h1 { font-family: "Raleway", sans-serif; font-size: 1.1em; letter-spacing: 1.5px; margin: 0; font-weight: 700; text-transform: uppercase; color: #2c3e50; }
+  .site-title p { margin: 2px 0 0; font-size: 0.9em; color: #666; font-weight: 600; }
+
+  /* --- 3. MODERN NAV BUTTONS --- */
+  nav {
+    background: transparent;
+    text-align: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  nav a {
+    color: #555; text-decoration: none; margin: 0 8px; padding: 10px 24px;
+    font-size: 0.85rem; 
+    font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    border-radius: 6px; transition: all 0.2s ease; display: inline-block;
+  }
+
+  /*nav a:hover { color: #4b61f3; background-color: rgba(75, 97, 243, 0.08); transform: translateY(-1px); }*/
+  nav a.active { color: #4b61f3; background-color: rgba(75, 97, 243, 0.08); transform: translateY(-1px); }
+
+  /* --- 4. MAIN CONTENT --- */
+  main {
+    flex: 1; padding: 60px 50px; max-width: 900px; margin: 0 auto;
+    
+    /* Correction: Added padding-top so text isn't hidden behind fixed header */
+    padding-top: 240px; 
+    
+    background: transparent; 
+  }
+  
+  /* Card Effect */
+  .content-card {
+    background: white; padding: 50px; border-radius: 8px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05), 0 5px 15px rgba(0,0,0,0.03);
+    animation: fadeUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; opacity: 0;
+  }
+
+  main p { margin-bottom: 25px; font-size: 1.05rem; color: #444; text-align: justify; }
+  main a { color: #4b61f3; text-decoration: none; font-weight: 600; position: relative; transition: color 0.3s ease; }
+  main a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -1px; left: 0; background-color: #4b61f3; transition: width 0.3s ease; }
+  main a:hover { color: #2c3e50; }
+  main a:hover::after { width: 100%; }
+
+  footer { background: #f9f9f9; color: #888; text-align: center; padding: 40px 20px; font-size: 0.85em; border-top: 1px solid #eee; }
+  footer a { color: #4b61f3; text-decoration: none; }
+
+  @media screen and (max-width: 768px) {
+    .fixed-header-container { position: relative; } 
+    main { padding-top: 40px; }
+    .logo-title-wrapper { margin-left: 0; align-items: center; text-align: center; }
+    .nav-logo { display: block; font-size: 28px; cursor: pointer; padding: 10px 20px; }
+    .nav-links { display: none; flex-direction: column; padding-top: 10px; background: #fff; width: 100%; }
+    .nav-links.show { display: flex; }
+    .nav-links a { margin: 5px 0; display: block; text-align: center; }
+  }
+  
+  .nav-logo { display: none; }
+  @media screen and (max-width: 768px) { .nav-logo { display: block; } }
+  .goog-te-banner-frame { display: none !important; }
+  </style>
+</head>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const navLogo = document.querySelector('.nav-logo');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (navLogo && mobileMenu) {
+      navLogo.addEventListener('click', () => { mobileMenu.classList.toggle('show'); });
+    }
+  });
+</script>
+
+<body>
+  <div class="wrapper">
+    <div class="fixed-header-container">
+      <header>
+        <div class="logo-title-wrapper">
+          <a href="index.html"><img src="https://www.cealex.org/wp-content/uploads/2024/05/newlogo.png" alt="CEALEX Logo"></a>
+          <div class="site-title">
+            <h1>CENTRE D'ÉTUDES ALEXANDRINES</h1>
+            <p>UAR 3134</p>
+          </div>
+        </div>
+      </header>
+
+      <nav class="nav">
+        <div class="nav-container">
+          <div class="nav-logo">☰</div> 
+          <div class="nav-links" id="mobileMenu">
+            <a href="index.html" class="active">Présentation</a>
+            <a href="https://www.cealex.org/le-cealex/" target="_blank">Le CEAlex</a>
+            <a href="/carte" target="_blank">Carte</a>
+            <a href="/bibliographie">Bibliographie</a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <main>
+      <div class="content-card">
+        <p>Cette nouvelle plateforme est destinée à devenir le portail central des ressources cartographiques relatives à Alexandrie et à sa région. Il intégrera à terme le catalogue de la cartothèque du CEAlex ainsi que l’ensemble des projets de recherche basés sur la modélisation et la représentation spatiale.</p>
+        <p>Pour son inauguration, le portail met en ligne la Carte Archéologique d’Alexandrie. Ce projet scientifique est une première version, mais il intègre déjà une quantité importante des découvertes archéologiques faites dans la ville en s’appuyant notamment sur le travail majeur effectué par B. Tkaczow. Ce système d’information géographique (SIG) intègre divers fonds de carte géoréférencés, notamment la carte historique de Mahmoud bey el-Falaki (1866), la carte archéologique d’Achille Adriani (1934), les plans de Barbara Tkaczow (1993) et le cadastre alexandrin provenant du Survey of Egypt (1933-1948). Il offrira à terme plus de cartes géoréférencées et d’autres découvertes archéologiques, notamment celles des nécropoles alexandrines.</p>
+        <p>La réalisation de cette infrastructure numérique est le fruit d'une collaboration pluridisciplinaire au sein du CEAlex. Les travaux de modélisation initiale ont été établis par Mathias Cunault (stage - Université François Rabelais, Tours) dès 2011, alors que l’implémentation d’un premier Web-SIG avait été menée par Aubin Bettiol (stage – ENSG). Le projet a ensuite bénéficié d’un travail approfondi mené par <a href="https://www.cealex.org/le-cealex/annuaire/filippo-mi/" target="_blank">Filippo Mi</a> sur l’extension et la correction des données archéologiques. <a href="https://www.cealex.org/le-cealex/annuaire/cs/" target="_blank">Cécile Shaalan</a> (Responsable du service Cartographie et Topographie) et Vincent Razanajao (Responsable des Humanités Numériques) ont collaboré à la supervision de ce projet. Le développement de l’outil a été assuré par le service informatique du CEAlex, avec l’engagement de <a href="https://www.cealex.org/le-cealex/annuaire/kmohsen/" target="_blank">Kamal Mohsen</a> (Responsable du service Informatique), <strong>Mustafa Morsi</strong>, et <strong>Ezz El-Din Ahmed</strong>, et plus généralement, de l’ensemble de l’équipe institutionnelle.</p>
+        <p>Ce nouvel outil constitue une ressource essentielle pour la recherche archéologique et la valorisation du patrimoine d’Alexandrie.</p>
+      </div>
+    </main>
+
+    <footer>
+      <em>&copy; 2026 Centre d'Études Alexandrines – <a href="https://www.cealex.org/mentions-legales/" target="_blank">Mentions légales</a></em>
+    </footer>
+  </div>
+</body>
+</html>

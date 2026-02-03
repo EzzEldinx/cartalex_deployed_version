@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bibliographie - Cartalex</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Raleway:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+  /* --- 1. SHARED ANIMATIONS & GLOBAL --- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  body {
+    top: 0px !important;
+    margin: 0;
+    background-color: #f9f9f9; 
+    font-family: 'Open Sans', sans-serif;
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.8;
+  }
+
+  html, body { height: 100%; }
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* --- 2. STICKY TOP BAR (Matches Index) --- */
+  .sticky-top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+
+  /* Header */
+  header {
+    background-color: transparent; 
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 15px 40px;
+  }
+
+  .logo-title-wrapper { display: flex; flex-direction: column; align-items: flex-start; margin-left: 130px; }
+  .logo-title-wrapper img { height: 100px; margin-bottom: 8px; transition: height 0.3s ease; }
+  .site-title h1 { font-family: "Raleway", sans-serif; font-size: 1.1em; letter-spacing: 1.5px; margin: 0; font-weight: 700; text-transform: uppercase; color: #2c3e50; }
+  .site-title p { margin: 2px 0 0; font-size: 0.9em; color: #666; font-weight: 600; }
+
+  /* --- 3. MODERN NAV BUTTONS (Matches Index) --- */
+  nav {
+    background-color: transparent;
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  nav a {
+    color: #555;
+    text-decoration: none;
+    margin: 0 8px;
+    padding: 10px 24px;
+    
+    /* Typography Upgrade (Matches Index) */
+    font-size: 0.85rem; 
+    font-weight: 700; /* BOLD */
+    text-transform: uppercase; /* UPPERCASE */
+    letter-spacing: 1px;
+    
+    border-radius: 6px; 
+    transition: all 0.2s ease;
+    display: inline-block;
+  }
+
+  /*nav a:hover { color: #4b61f3; background-color: rgba(75, 97, 243, 0.08); transform: translateY(-1px); }*/
+  nav a.active { color: #4b61f3; background-color: rgba(75, 97, 243, 0.08); transform: translateY(-1px); }
+
+  /* --- 4. MAIN CARD LAYOUT --- */
+  main {
+    flex: 1;
+    
+    padding: 60px 50px;
+    max-width: 1000px; /* Slightly wider for bibliography */
+    margin: 40px auto;
+    background: white;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05), 0 5px 15px rgba(0,0,0,0.03);
+    border-radius: 8px;
+    
+    /* Animation Entry */
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+
+  /* --- 5. BIBLIOGRAPHY SPECIFIC STYLES --- */
+  .search-container {
+    margin-bottom: 30px;
+    position: relative;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 12px 20px;
+    padding-right: 40px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    background: #f8f9fa;
+    transition: all 0.3s;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    background: white;
+    border-color: #4b61f3;
+    box-shadow: 0 0 0 3px rgba(75, 97, 243, 0.1);
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+  }
+
+  .section-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    text-align: center;
+  }
+
+  /* Bibliography Items */
+  .bib-item {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  
+  .bib-item:hover {
+    background-color: #f8f9ff;
+  }
+  
+  .bib-item a {
+    color: #4b61f3;
+    text-decoration: none;
+  }
+  
+  .bib-item a:hover {
+    text-decoration: underline;
+  }
+
+  /* --- PAGINATION (UPDATED TO MATCH SCREENSHOT) --- */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+    gap: 8px; /* Spacing between buttons */
+  }
+  
+  .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px; /* Fixed square width */
+    height: 38px; /* Fixed square height */
+    cursor: pointer;
+    color: #0079c1; /* Blueish text for inactive */
+    border: 1px solid #e5e5e5; /* Light border */
+    border-radius: 4px; /* Slightly rounded corners */
+    font-size: 1rem;
+    background: #fff;
+    transition: all 0.2s;
+  }
+  
+  /* Active State: Dark Background, White Text */
+  .page-link.active {
+    background-color: #333333; 
+    color: #fff;
+    border-color: #333333;
+  }
+  
+  .page-link:hover:not(.active) {
+    background: #f5f5f5; /* Light grey hover */
+  }
+
+  /* Loading Spinner */
+  #loader { text-align: center; padding: 60px; color: #ccc; }
+
+  /* --- 6. FOOTER --- */
+  footer {
+    background: #f9f9f9;
+    color: #888;
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 0.85em;
+    border-top: 1px solid #eee;
+  }
+
+  footer a {
+    color: #4b61f3;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  footer a:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+  }
+
+  /* --- 7. SIDEBAR (Details Panel) --- */
+  :root { --detail-bg: #2b2b2b; --detail-text: #e1e1e1; --detail-label: #aaaaaa; }
+  
+  .sidebar-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3); z-index: 1100; display: none;
+  }
+  
+  .sidebar {
+    position: fixed; top: 0; right: -500px;
+    width: 450px; height: 100vh;
+    background-color: var(--detail-bg);
+    color: var(--detail-text);
+    z-index: 1200;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex; flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 13px;
+  }
+  
+  .sidebar.active { right: 0; }
+  
+  .sidebar-tabs {
+    display: flex; background: #333;
+    border-bottom: 1px solid #444; padding: 0 10px;
+  }
+  
+  .tab-btn {
+    background: none; border: none; color: #888;
+    padding: 12px 18px; font-weight: 600; cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  
+  .tab-btn.active { color: #fff; border-bottom: 2px solid #4b61f3; }
+  
+  .sidebar-actions {
+    padding: 10px; display: flex; justify-content: flex-end;
+    border-bottom: 1px solid #444;
+  }
+  
+  .close-btn {
+    background: none; border: none; color: #aaa;
+    font-size: 18px; cursor: pointer;
+  }
+  .close-btn:hover { color: white; }
+  
+  .detail-content { flex: 1; overflow-y: auto; padding: 20px; }
+  
+  .field-row { display: flex; margin-bottom: 10px; }
+  .field-label { flex: 0 0 100px; color: var(--detail-label); text-align: right; padding-right: 15px; font-size: 11px; text-transform: uppercase; }
+  .field-value { flex: 1; color: #eee; line-height: 1.4; word-wrap: break-word; }
+  .field-value a { color: #6ab0ff; text-decoration: none; }
+  
+  .divider { border-bottom: 1px solid #444; margin: 15px 0; }
+  
+  .abstract-container { background: #232323; padding: 10px; border: 1px solid #444; border-radius: 4px; margin-top: 10px; }
+  .abstract-header { color: #888; font-size: 10px; font-weight: 700; margin-bottom: 5px; }
+  .abstract-box { color: #ccc; white-space: pre-wrap; line-height: 1.5; }
+
+  /* --- RESPONSIVE --- */
+  @media screen and (max-width: 768px) {
+    .fixed-header-container { position: relative; } /* Unfix on mobile */
+    main { padding-top: 40px; }
+    .logo-title-wrapper { margin-left: 0; align-items: center; text-align: center; }
+    .nav-logo { display: block; font-size: 28px; cursor: pointer; padding: 10px 20px; }
+    .nav-links { display: none; flex-direction: column; padding-top: 10px; background: #fff; width: 100%; }
+    .nav-links.show { display: flex; }
+    .nav-links a { margin: 5px 0; display: block; text-align: center; }
+    .sidebar { width: 100%; right: -100%; }
+  }
+  .nav-logo { display: none; }
+  @media screen and (max-width: 768px) { .nav-logo { display: block; } }
+  .goog-te-banner-frame { display: none !important; }
+  </style>
+</head>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const navLogo = document.querySelector('.nav-logo');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (navLogo && mobileMenu) {
+      navLogo.addEventListener('click', () => mobileMenu.classList.toggle('show'));
+    }
+  });
+</script>
+
+<body>
+  <div class="wrapper">
+    <div class="sticky-top-bar">
+      <header>
+        <div class="logo-title-wrapper">
+          <a href="index.html"><img src="../img/logo.png" alt="CEALEX Logo"></a>
+          <div class="site-title">
+            <h1>CENTRE D'ÉTUDES ALEXANDRINES</h1>
+            <p>UAR 3134</p>
+          </div>
+        </div>
+      </header>
+
+      <nav class="nav">
+        <div class="nav-container">
+          <div class="nav-logo">☰</div> <div class="nav-links" id="mobileMenu">
+            <a href="index.html">Présentation</a>
+            <a href="https://www.cealex.org/le-cealex/" target="_blank">Le CEAlex</a>
+            <a href="/carte" target="_blank">Carte</a>
+            <a href="/bibliographie" class="active">Bibliographie</a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <main>
+      <div class="content-card">
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Search bibliography (author, title, year)...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div class="section-label" id="list-label">All References</div>
+        
+        <div id="loader" style="text-align:center; padding:40px; color:#999;">
+            <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+        </div>
+        
+        <div id="biblio-container" class="biblio-list"></div>
+        <div class="pagination" id="pagination" style="display:none;"></div>
+      </div>
+    </main>
+
+    <footer>
+        <em>&copy; 2026 Centre d'Études Alexandrines – <a href="https://www.cealex.org/mentions-legales/" target="_blank">Mentions légales</a></em>
+    </footer>
+
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">Item Details</span>
+            <button class="close-btn" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="detail-content" id="detail-content"></div>
+    </div>
+  </div>
+
+  <script>
+    let fullDataset = []; let displayedItems = []; let currentPage = 1; const itemsPerPage = 15;
+
+    (async function() {
+        await loadAllItems();
+        document.getElementById("search-input").addEventListener("input", (e) => filterData(e.target.value));
+    })();
+
+    async function loadAllItems() {
+        const loader = document.getElementById("loader");
+        const container = document.getElementById("biblio-container");
+        try {
+            const res = await fetch(`/zotero-api?collectionKey=all`);
+            if(!res.ok) throw new Error("Failed");
+            const data = await res.json();
+            fullDataset = data; displayedItems = data;
+            loader.style.display = "none";
+            renderPage(1);
+        } catch (e) {
+            loader.innerHTML = `<p style="color:red">Error loading data.</p>`;
+        }
+    }
+
+    function renderPage(page) {
+        currentPage = page;
+        const container = document.getElementById("biblio-container");
+        container.innerHTML = "";
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        
+        if (displayedItems.length === 0) {
+             container.innerHTML = '<div style="color:#777; padding:20px; text-align:center;">No matching items found.</div>';
+             return;
+        }
+
+        displayedItems.slice(start, end).forEach(item => {
+            const div = document.createElement("div");
+            div.className = "bib-item";
+            div.innerHTML = processCitation(item.bib); 
+            div.onclick = (e) => {
+                if (e.target.tagName === 'A') return;
+                openSidebar(item);
+            };
+            container.appendChild(div);
+        });
+        renderPagination();
+    }
+
+    function renderPagination() {
+        const container = document.getElementById("pagination");
+        const totalPages = Math.ceil(displayedItems.length / itemsPerPage);
+        if (totalPages <= 1) { container.style.display = "none"; return; }
+        container.style.display = "flex"; container.innerHTML = "";
+        const maxBtns = 5;
+        let start = Math.max(1, currentPage - 2);
+        let end = Math.min(totalPages, start + maxBtns - 1);
+        if (end - start < maxBtns - 1) start = Math.max(1, end - maxBtns + 1);
+        for (let i = start; i <= end; i++) {
+            const btn = document.createElement("div");
+            btn.className = `page-link ${i === currentPage ? 'active' : ''}`;
+            btn.innerText = i;
+            btn.onclick = () => renderPage(i);
+            container.appendChild(btn);
+        }
+    }
+
+    function filterData(q) {
+        const term = q.toLowerCase();
+        displayedItems = fullDataset.filter(i => (i.bib||"").toLowerCase().includes(term));
+        renderPage(1);
+    }
+
+    function processCitation(bibHtml) {
+        let cleanHtml = bibHtml.replace(/\s?OEB\.?/g, "");
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cleanHtml;
+        const urlRegex = /(https?:\/\/[^\s<]+)/g;
+        function traverse(node) {
+            if (node.nodeType === 3) {
+                const text = node.nodeValue;
+                if (urlRegex.test(text)) {
+                    const newHtml = text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
+                    const span = document.createElement('span');
+                    span.innerHTML = newHtml;
+                    node.replaceWith(span);
+                }
+            } else if (node.nodeType === 1 && node.tagName.toLowerCase() !== 'a') Array.from(node.childNodes).forEach(traverse);
+        }
+        Array.from(tempDiv.childNodes).forEach(traverse);
+        return tempDiv.innerHTML;
+    }
+
+    // Sidebar Logic
+    const typeLabels = { book: 'Book', bookSection: 'Book Section', journalArticle: 'Journal Article', thesis: 'Thesis', report: 'Report', webpage: 'Webpage', blogPost: 'Blog Post', presentation: 'Presentation', map: 'Map', conferencePaper: 'Conference Paper' };
+
+    function openSidebar(item) {
+        const c = document.getElementById("detail-content");
+        const d = item.data;
+        let html = "";
+        const row = (l, v) => v ? `<div class="field-row"><div class="field-label">${l}</div><div class="field-value">${v}</div></div>` : "";
+        html += row("Title", `<strong>${d.title}</strong>`);
+        html += row("Type", d.itemType);
+        html += row("Date", d.date);
+        html += row("Url", d.url ? `<a href="${d.url}" target="_blank">Link</a>` : "");
+        c.innerHTML = html;
+        document.getElementById("overlay").style.display = "block";
+        setTimeout(() => document.getElementById("sidebar").classList.add("active"), 10);
+    }
+
+    function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("active");
+        setTimeout(() => document.getElementById("overlay").style.display = "none", 300);
+    }
+  </script>
+</body>
+</html>
