@@ -9,7 +9,6 @@ import compression from 'compression';
 import ejs from 'ejs';
 import { fileURLToPath } from 'url';
 
-// Import the new router and error handler
 import router from './routes.js';
 import { errorHandler } from './middleware.js';
 
@@ -17,21 +16,24 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dist_dir = path.join(__dirname, '..', '..', 'dist');
+
+const root_dir = path.join(__dirname, '..', '..');
+const dist_dir = path.join(root_dir, 'dist');
+const public_dir = path.join(root_dir, 'public');
 
 const app = express();
-// in src/server/server.js
-app.use(express.static('dist'));
-app.use(express.static('public')); // <--- Ensure this line is present
-app.use(morgan('dev'));
 
-// Set the view engine and views directory correctly
+app.use(morgan('dev'));
+app.use(compression());
+app.use(express.json());
+
 app.set('view engine', 'html');
 app.engine('html', ejs.renderFile);
+
+// Set views to dist because Webpack puts the processed HTML there
 app.set('views', dist_dir);
 
-// CORS configuration
-const allowedOrigins = [process.env.CORS_ORIGIN || 'http://localhost:5000'];
+const allowedOrigins = [process.env.CORS_ORIGIN || 'http://localhost:3000'];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -42,28 +44,24 @@ app.use(cors({
   }
 }));
 
-app.use(express.json());
+// Serve static files from dist (where the build lives)
 app.use(express.static(dist_dir));
-app.use(compression());
+// Serve static assets from public
+app.use(express.static(public_dir));
 
-// --- Use the new, corrected router for all API and page routes ---
-// All the old, buggy middleware and route handlers that were here are now GONE.
 app.use('/', router);
 
-// Swagger setup
 const swaggerDocument = YAML.load('./swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Centralized error handler (must be last)
 app.use(errorHandler);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`App listening to ${port}....`);
-    console.log('Press Ctrl+C to quit.');
+    console.log(`Targeting dist directory: ${dist_dir}`);
 });

@@ -2,7 +2,6 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import './css/map.css';
 import maplibregl from 'maplibre-gl';
 import { App } from './js/app.js';
-import { server_config } from './js/server_config.js'; // Ensure correct path if needed
 
 document.addEventListener('DOMContentLoaded', async () => {
     

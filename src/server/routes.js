@@ -13,8 +13,11 @@ const __dirname = path.dirname(__filename);
 const CACHE_FILE = path.join(__dirname, 'zotero_cache.json');
 
 // --- PAGE ROUTES ---
-router.get('/', (req, res) => res.render('index.html'));
-router.get('/bibliographie', (req, res) => res.render('zotero.html'));
+// These names correspond to the files in src/html/
+router.get('/', (req, res) => res.render('index'));
+router.get('/bibliographie', (req, res) => res.render('zotero'));
+router.get('/carte', (req, res) => res.render('map'));
+router.get('/carte/:fid(\\d+)', (req, res) => res.render('map'));
 
 const ZOTERO_GROUP_ID = 6259582;
 
@@ -41,8 +44,6 @@ function sortZoteroItems(items) {
         if (authorA > authorB) return 1;
 
         // 2. If Authors Match -> Sort by Date (Oldest to Newest)
-        // Zotero dates are usually ISO strings or years (e.g., "2023", "2023-05-01")
-        // String comparison works well for standard ISO dates.
         const dateA = a.data.date || "0000";
         const dateB = b.data.date || "0000";
 
@@ -128,7 +129,6 @@ async function updateZoteroCache() {
         const baseUrl = `https://api.zotero.org/groups/${ZOTERO_GROUP_ID}/items`; 
 
         while (hasMore) {
-            // Note: We sort by creator here too to get consistent batches
             const url = `${baseUrl}?format=json&include=bib,data&limit=${limit}&start=${start}&sort=creator&direction=asc`;
             
             console.log(`   -> Fetching batch ${start}...`);
@@ -152,7 +152,7 @@ async function updateZoteroCache() {
 
         // C. Update Cache
         if (fetchedItems.length > 0) {
-            // --- APPLY SORTING BEFORE SAVING ---
+            // APPLY SORTING BEFORE SAVING
             CACHE.items = sortZoteroItems(fetchedItems);
             
             CACHE.lastUpdated = new Date();
@@ -214,7 +214,7 @@ router.get('/zotero-api', async (req, res) => {
         
         const items = await response.json();
         
-        // --- APPLY SORTING TO FALLBACK DATA TOO ---
+        // APPLY SORTING TO FALLBACK DATA TOO
         const sortedItems = sortZoteroItems(items);
         
         res.json(sortedItems);
@@ -226,8 +226,6 @@ router.get('/zotero-api', async (req, res) => {
 });
 
 // --- Map & DB Routes ---
-router.get('/carte/:fid(\\d+)', (req, res) => res.render('map.html'));
-router.get('/carte', (req, res) => res.render('map.html'));
 
 router.get('/sitesFouilles/:fid/details', async (req, res, next) => {
     const { fid } = req.params;
@@ -236,7 +234,10 @@ router.get('/sitesFouilles/:fid/details', async (req, res, next) => {
         if (!details) return res.status(404).json({ error: 'Site not found' });
 
         const discoveries = await db.any('SELECT p.nom AS inventeur, d.date_decouverte, dt."labelFr" as type_decouverte FROM public.decouvertes AS d LEFT JOIN public.personnes AS p ON d.id_inventeur = p.id LEFT JOIN public.discovery_types AS dt ON d.type = dt.id WHERE d.fid_site = $1 ORDER BY d.date_decouverte ASC;', [fid]);
-        const vestiges = await db.any('SELECT c.caracterisation, p.periode FROM public.vestiges v JOIN public.caracterisations c ON v.id_caracterisation = c.id LEFT JOIN public.datations d ON v.id = d.id_vestige LEFT JOIN public.periodes p ON d.id_periode = p.id WHERE v.fid_site = $1;', [fid]);
+        
+        // Updated query to include labelEn for dynamic translation support
+        const vestiges = await db.any('SELECT v.id, c.caracterisation, c."labelEn", p.periode FROM public.vestiges v JOIN public.caracterisations c ON v.id_caracterisation = c.id LEFT JOIN public.datations d ON v.id = d.id_vestige LEFT JOIN public.periodes p ON d.id_periode = p.id WHERE v.fid_site = $1;', [fid]);
+        
         const bibliographies = await db.any('SELECT b."Title" as title, b."Publication_Title" as publication_title, b."Author" as author, b."Date" as date, b."Item_Type" as item_type, b."Url" as url, b."Place" as place, b."Publisher" as publisher, b."Volume" as volume, b."Issue" as issue, b."Access_Date" as access_date, rb.pages FROM public.bibliography_zotero b JOIN public."references_biblio" rb ON b.id = rb.id_biblio WHERE rb.fid_site = $1;', [fid]);
         
         res.json({ details, discoveries, vestiges, bibliographies });
@@ -246,6 +247,12 @@ router.get('/sitesFouilles/:fid/details', async (req, res, next) => {
 router.get('/getValues/:tableName', cacheMiddleware, addOrderAliasOnSelectDistinct, async (req, res, next) => {
     const { tableName } = req.params;
     let dbquery = res.locals.selectQuery;
+
+    // Ensure labelEn is included when fetching from vestiges/caracterisations
+    if (tableName === 'vestiges') {
+        dbquery = dbquery.replace('SELECT DISTINCT', 'SELECT DISTINCT public.caracterisations."labelEn",');
+    }
+
     switch (tableName) {
         case 'vestiges': dbquery += ' FROM public.vestiges JOIN public.datations ON public.vestiges.id = public.datations.id_vestige JOIN public.caracterisations ON public.vestiges.id_caracterisation = public.caracterisations.id JOIN public.periodes ON public.datations.id_periode = public.periodes.id'; break;
         case 'bibliographies': dbquery += ' FROM public.bibliography_zotero'; break;

@@ -4,7 +4,7 @@ import { filters_config } from './filters_config.js';
 import { server_config } from './server_config.js';
 import { buildFilterUI, buildLayerList, attachAllEventListeners } from './ui.js';
 import { DistanceMeasure } from './DistanceMeasure.js';
-import { translations } from './translations.js'; // Import Translations
+import { translations } from './translations.js'; 
 
 const defaultPointColor = 'rgb(155, 0, 245)'; 
 const highlightPointColor = 'rgb(15, 150, 36)'; 
@@ -21,6 +21,8 @@ export class App {
         ];
         this.hoveredFid = null;
         this.distanceMeasure = null;
+        this.lastPopupFid = null;
+        this.lastPopupCoords = null;
         this.injectToastStyles();
     }
 
@@ -34,7 +36,7 @@ export class App {
             this.initDeepLinkHandlers();
             this.initHoverEffect();
             this.initDistanceMeasure();
-            this.initLanguageSwitcher(); // <--- Init Switcher
+            this.initLanguageSwitcher(); 
             
             this.applyHighlightStyle(undefined); 
             console.log('Application initialized successfully.');
@@ -50,7 +52,13 @@ export class App {
             btn.addEventListener('click', () => {
                 const newLang = translations.toggle();
                 this.updateLanguageUI(newLang);
-                // Force popup refresh if open
+
+                // Trigger rebuild of Filter UI to apply dynamic DB labels (labelEn)
+                if (this.filterCollection) {
+                    buildFilterUI(this.filterCollection.getFilters());
+                }
+
+                // Force popup refresh if open to update vestige labels
                 if (this.popup && this.lastPopupFid) {
                     this.showPopupForSite(this.lastPopupFid, this.lastPopupCoords);
                 }
@@ -69,7 +77,6 @@ export class App {
         });
     }
 
-    // ... (initFilters, initLayerList, initEventListeners, initMapClickListener... same as before) ...
     async initFilters() {
         const layerName = 'sitesFouilles';
         this.filterCollection = new FilterCollection(layerName, filters_config[layerName], server_config.api_at);
@@ -285,10 +292,10 @@ export class App {
         return /^[\d\s-]+$/.test(pages) ? `p.\u00A0${pages}` : pages;
     }
 
-    // --- UPDATED POPUP LOGIC FOR TRANSLATION ---
     async showPopupForSite(fid, coordinates) {
         this.lastPopupFid = fid;
         this.lastPopupCoords = coordinates;
+        const currentLang = translations.currentLang;
 
         try {
             const response = await fetch(`${server_config.api_at}/sitesFouilles/${fid}/details`);
@@ -298,7 +305,6 @@ export class App {
             const details = data.details || {};
             const tkaczow = details.num_tkaczow ? `${translations.get('pop-tkaczow')}\u00A0${details.num_tkaczow}` : '';
             
-            // --- TRANSLATED DISCOVERY SECTION ---
             let discoveryHTML = '';
             if (data.discoveries && data.discoveries.length > 0) {
                 discoveryHTML = `<ul style="margin: 5px 0; padding-left: 20px;">` + data.discoveries.map(d => {
@@ -329,7 +335,9 @@ export class App {
             if (data.vestiges && data.vestiges.length > 0) {
                 const vestigeMap = new Map();
                 data.vestiges.forEach(v => {
-                    const char = v.caracterisation || translations.get('pop-non-specifie');
+                    // DYNAMIC TRANSLATION: Prefer labelEn if active language is English
+                    const char = (currentLang === 'en' && v.labelEn) ? v.labelEn : (v.caracterisation || translations.get('pop-non-specifie'));
+                    
                     if (!vestigeMap.has(char)) { vestigeMap.set(char, []); }
                     if (v.periode) {
                         const cleanPeriod = v.periode.split(' (')[0]; 

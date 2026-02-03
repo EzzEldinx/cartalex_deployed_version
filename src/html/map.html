@@ -25,9 +25,7 @@
     </button>
 
     <main id="main-content" tabindex="-1">
-      
       <div id="map" aria-label="Map display area"></div>
-
       <div id="popup" class="ol-popup" role="dialog" aria-modal="true">
         <a href="#" id="popup-closer" class="ol-popup-closer" aria-label="Close popup">Close</a>
         <div id="popup-content"></div>
@@ -39,7 +37,6 @@
           <button class="top-reset-btn" id="btn-reset-filters" data-i18n="ui-reset">
             <i class="fas fa-undo"></i>&nbsp;Réinitialiser
           </button>
-          
           <a href="#" class="ouvrir" data-i18n="ui-query-filters">Filtres de requête ▼</a>
           <a href="#" class="fermer" data-i18n="ui-close-panel">Fermer le volet</a>
         </nav>
@@ -56,18 +53,12 @@
       </div>
 
       <div id="coordinates-display" class="map-overlay">Coordinates: --</div>
-      
       <div id="map-credits">
         <ul>
-            <li id="main-map-title" data-i18n="ui-map-title">
-                Carte des découvertes archéologiques d'Alexandrie
-            </li>
-            <li id="project-credit" data-i18n="ui-project-credit">
-                CE-Alex (UAR 3134)  
-            </li>
+            <li id="main-map-title" data-i18n="ui-map-title">Carte des découvertes archéologiques d'Alexandrie</li>
+            <li id="project-credit" data-i18n="ui-project-credit">CE-Alex (UAR 3134)</li>
         </ul>
       </div>
-
     </main>
 
     <script type="module" src="../index.js"></script>
