@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <title class="notranslate">Cartalex - Centre d'Études Alexandrines</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+  /* =========================================
+     CRITICAL OVERRIDES (Fixes Layout Issues)
+     ========================================= */
+  /* These force the page to scroll and layout correctly, 
+     overriding the 'map.css' settings that break the home page. */
+  
+  html, body {
+      height: auto !important;
+      min-height: 100vh !important;
+      overflow-y: auto !important; /* ENABLES SCROLLING */
+      overflow-x: hidden !important;
+      position: static !important;
+  }
+
+  body {
+      display: flex;
+      flex-direction: column;
+      background-color: #f9f9f9; 
+      font-family: 'Open Sans', sans-serif;
+      color: #333;
+      line-height: 1.8;
+  }
+
+  .wrapper {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+      position: relative;
+  }
+
+  /* --- HEADER --- */
+  header {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding: 15px 40px;
+      
+      /* FIX: Relative ensures it pushes content down, never covering it */
+      position: relative !important; 
+      z-index: 1000;
+  }
+
+  .logo-title-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-left: 130px; 
+  }
+
+  .logo-title-wrapper img {
+      height: 100px;
+      margin-bottom: 8px;
+      transition: height 0.3s ease;
+  }
+
+  .site-title h1 {
+      font-family: "Raleway", sans-serif;
+      font-size: 1.1em;
+      letter-spacing: 1.5px;
+      margin: 0;
+      color: #2c3e50;
+      font-weight: 700;
+      text-transform: uppercase;
+  }
+
+  .site-title p {
+      margin: 2px 0 0;
+      font-size: 0.9em;
+      color: #666;
+      font-weight: 600;
+  }
+
+  /* --- NAVIGATION --- */
+  nav {
+      background-color: #ffffff;
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      position: relative !important;
+      z-index: 900;
+  }
+
+  .nav-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .nav-links { display: block; }
+
+  nav a {
+      color: #555;
+      text-decoration: none;
+      margin: 0 8px;
+      padding: 10px 24px;
+      font-size: 0.85rem; 
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: inline-block;
+  }
+
+  nav a:hover {
+      color: #4b61f3;
+      background-color: rgba(75, 97, 243, 0.08);
+      transform: translateY(-1px);
+  }
+
+  /* Hamburger (Hidden on Desktop) */
+  .nav-logo { 
+      display: none; 
+      font-size: 28px;
+      cursor: pointer;
+      color: #2c3e50;
+      padding: 10px;
+  }
+  /* --- MAIN CONTENT (FIXED) --- */
+  main {
+      /* FIX: Reset position so it flows naturally below header */
+      position: relative !important; 
+      top: auto !important;
+      left: auto !important;
+      height: auto !important;
+      width: auto !important;
+      
+      flex: 1;
+      padding: 60px 50px;
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.05), 0 5px 15px rgba(0,0,0,0.03);
+      border-radius: 8px;
+  }
+
+  /* TEXT ALIGNMENT */
+  main p {
+      opacity: 0; 
+      animation: fadeUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      margin-bottom: 25px;
+      font-size: 1.05rem;
+      color: #444;
+      text-align: justify; /* Clean desktop edges */
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  main p:nth-child(1) { animation-delay: 0.1s; }
+  main p:nth-child(2) { animation-delay: 0.25s; }
+  main p:nth-child(3) { animation-delay: 0.4s; }
+  main p:nth-child(4) { animation-delay: 0.55s; }
+
+  main a {
+      color: #4b61f3;
+      text-decoration: none;
+      font-weight: 600;
+      position: relative;
+      transition: color 0.6s ease;
+  }
+
+  main a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -1px;
+      left: 0;
+      background-color: #4b61f3;
+      transition: width 0.3s ease;
+  }
+
+  main a:hover { color: #2c3e50; }
+  main a:hover::after { width: 100%; }
+
+  footer {
+      background: #f9f9f9; color: #888; text-align: center; padding: 40px 20px;
+      font-size: 0.85em; border-top: 1px solid #eee; margin-top: auto;
+  }
+  footer a { color: #4b61f3; text-decoration: none; transition: opacity 0.2s; }
+  footer a:hover { text-decoration: underline; opacity: 0.8; }
+
+  /* =========================================
+     MOBILE RESPONSIVE (Max 768px)
+     ========================================= */
+  @media screen and (max-width: 768px) {
+    header {
+      padding: 15px 20px;
+      text-align: center;
+    }
+
+    .logo-title-wrapper {
+      margin-left: 0; 
+      align-items: center; 
+      width: 100%;
+    }
+
+    .logo-title-wrapper img { height: 80px; }
+    .site-title h1 { font-size: 1em; }
+    
+    nav { padding: 10px 20px; }
+    
+    .nav-container { 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        width: 100%;
+    }
+
+    /* Hamburger */
+    .nav-logo { 
+        display: block; 
+        align-self: flex-end; 
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 1100;
+    }
+
+    /* Menu Links */
+    .nav-links {
+      display: none; 
+      flex-direction: column;
+      width: 100%;
+      background: #fff;
+      border-top: 1px solid #eee;
+      margin-top: 15px;
+    }
+
+    .nav-links.show { display: flex; }
+
+    .nav-links a { 
+        margin: 0;
+        padding: 15px;
+        border-bottom: 1px solid #f5f5f5;
+        width: 100%;
+        display: block;
+    }
+
+    /* Main Content Mobile */
+    main {
+      padding: 30px 20px;
+      margin: 20px 15px; 
+      width: auto !important; /* Ensure override */
+      box-shadow: none;
+      background: white; 
+    }
+    
+    /* FIX: Center Text on Mobile */
+    main p {
+        text-align: center; 
+        font-size: 1rem;
+    }
+  }
+
+  .goog-te-banner-frame, .goog-te-balloon-frame { display: none !important; }
+  </style>
+</head>
+
+<body>
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (document.body.style.top) document.body.style.top = "0px";
+  });
+  </script>
+
+  <div class="wrapper">
+    <header>
+      <div class="logo-title-wrapper">
+        <a href="index.html"><img src="https://www.cealex.org/wp-content/uploads/2024/05/newlogo.png" alt="CEALEX Logo"></a>
+        <div class="site-title">
+          <h1>CENTRE D'ÉTUDES ALEXANDRINES</h1>
+          <p>UAR 3134</p>
+        </div>
+      </div>
+    </header>
+
+    <nav>
+      <div class="nav-container">
+        <div class="nav-logo">☰</div> 
+        
+        <div class="nav-links" id="mobileMenu">
+          <a href="index.html">Présentation</a>
+          <a href="https://www.cealex.org/le-cealex/" target="_blank">Le CEAlex</a>
+          <a href="/carte" id="link-carte">Carte</a>
+          <a href="/bibliography">Bibliography</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <p>Cette nouvelle plateforme est destinée à devenir le portail central des ressources cartographiques relatives à Alexandrie et à sa région. Il intégrera à terme le catalogue de la cartothèque du CEAlex ainsi que l’ensemble des projets de recherche basés sur la modélisation et la représentation spatiale.</p>
+
+      <p>Pour son inauguration, le portail met en ligne la Carte Archéologique d’Alexandrie. Ce projet scientifique est une première version, mais il intègre déjà une quantité importante des découvertes archéologiques faites dans la ville en s’appuyant notamment sur le travail majeur effectué par B. Tkaczow. Ce système d’information géographique (SIG) intègre divers fonds de carte géoréférencés, notamment la carte historique de Mahmoud bey el-Falaki (1866), la carte archéologique d’Achille Adriani (1934), les plans de Barbara Tkaczow (1993) et le cadastre alexandrin provenant du Survey of Egypt (1933-1948). Il offrira à terme plus de cartes géoréférencées et d’autres découvertes archéologiques, notamment celles des nécropoles alexandrines.</p>
+
+      <p>La réalisation de cette infrastructure numérique est le fruit d'une collaboration pluridisciplinaire au sein du CEAlex. Les travaux de modélisation initiale ont été établis par Mathias Cunault (stage - Université François Rabelais, Tours) dès 2011, alors que l’implémentation d’un premier Web-SIG avait été menée par Aubin Bettiol (stage – ENSG). Le projet a ensuite bénéficié d’un travail approfondi mené par <a href="https://www.cealex.org/le-cealex/annuaire/filippo-mi/" target="_blank">Filippo Mi</a> sur l’extension et la correction des données archéologiques. <a href="https://www.cealex.org/le-cealex/annuaire/cs/" target="_blank">Cécile Shaalan</a> (Responsable du service Cartographie et Topographie) et Vincent Razanajao (Responsable des Humanités Numériques) ont collaboré à la supervision de ce projet. Le développement de l’outil a été assuré par le service informatique du CEAlex, avec l’engagement de <a href="https://www.cealex.org/le-cealex/annuaire/kmohsen/" target="_blank">Kamal Mohsen</a> (Responsable du service Informatique), <strong>Mustafa Morsi</strong>, et <strong>Ezz El-Din Ahmed</strong>, et plus généralement, de l’ensemble de l’équipe institutionnelle.</p>
+
+      <p>Ce nouvel outil constitue une ressource essentielle pour la recherche archéologique et la valorisation du patrimoine d’Alexandrie.</p>
+    </main>
+
+    <footer>
+      <em>&copy; 2026 Centre d'Études Alexandrines – <a href="https://www.cealex.org/mentions-legales/" target="_blank">Mentions légales</a></em>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. Mobile Menu Toggle
+        const navLogo = document.querySelector('.nav-logo');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        if (navLogo && mobileMenu) {
+            navLogo.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileMenu.classList.toggle('show');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!navLogo.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.remove('show');
+                }
+            });
+        }
+
+        // 2. Smart Link Redirect (Mobile vs Desktop)
+        var isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        var mapLink = document.getElementById('link-carte');
+        
+        // Change this line in your Smart Link Logic
+      if (isMobileDevice) {
+         mapLink.href = "/mobile.html"; // Use a leading slash to stay at root
+      } else {
+          mapLink.href = "/carte"; 
+        }
+      });
+            
+  </script>
+</body>
+</html>

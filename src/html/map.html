@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carte - Cartalex</title>
+    
+    <script>
+        (function() {
+            var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile && !window.location.pathname.includes('mobile.html')) {
+                window.location.href = "/mobile.html";
+            }
+        })();
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Raleway:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
+ </head>
+ 
+ <body>
+
+    <a href="/" class="map-logo-overlay" style="position: absolute; top: 15px; left: 15px; z-index: 1000; opacity: 1; text-decoration: none;">
+        <img src="../img/logo.png" alt="CEAlex Logo" style="height: 90px; width: auto; border: none; display: block;">
+    </a>
+
+    <button id="lang-switch-btn" class="lang-floating-btn" aria-label="Switch Language">
+        <span class="lang-opt active">Fr</span>
+        <span class="lang-sep">|</span>
+        <span class="lang-opt">En</span>
+    </button>
+
+    <main id="main-content" tabindex="-1">
+      <div id="map" aria-label="Map display area"></div>
+
+      <div id="popup" class="ol-popup" role="dialog" aria-modal="true">
+        <a href="#" id="popup-closer" class="ol-popup-closer" aria-label="Close popup">Close</a>
+        <div id="popup-content"></div>
+      </div>
+
+      <div id="volet_haut_clos">
+        <div id="volet_haut"></div>
+        <nav class="onglets_haut" aria-label="Top filters">
+          <button class="top-reset-btn" id="btn-reset-filters" data-i18n="ui-reset">
+            <i class="fas fa-undo"></i>&nbsp;Réinitialiser
+          </button>
+          
+          <a href="#" class="ouvrir" data-i18n="ui-query-filters">Filtres de requête ▼</a>
+          <a href="#" class="fermer" data-i18n="ui-close-panel">Fermer le volet</a>
+        </nav>
+      </div>
+
+      <div id="volet_gauche_clos">
+        <div id="volet_gauche">
+          <ul id="items" class="layerDragbox" aria-label="Layer selection"></ul>
+        </div>
+        <nav class="onglets_gauche" aria-label="Left panel">
+          <a href="#" class="ouvrir" data-i18n="ui-layer-selection">Choix des couches</a>
+          <a href="#" class="fermer" data-i18n="ui-close-panel">Fermer le volet</a>
+        </nav>
+      </div>
+
+      <div id="coordinates-display" class="map-overlay">Coordinates: --</div>
+      
+      <div id="map-credits">
+        <ul>
+            <li id="main-map-title" data-i18n="ui-map-title">Carte des découvertes archéologiques d'Alexandrie</li>
+            <li id="project-credit" data-i18n="ui-project-credit">CE-Alex (UAR 3134)</li>
+        </ul>
+      </div>
+    </main>
+</body>
+</html>
