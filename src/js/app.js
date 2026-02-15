@@ -40,15 +40,53 @@ export class App {
 
             this.initMapClickListener();
             this.initDeepLinkHandlers();
-            this.initHoverEffect();
+            this.initHoverEffect(); 
             this.initDistanceMeasure();
             this.initLanguageSwitcher(); 
             
+            // --- FIX: START PULSE ANIMATION HERE ---
+            this.animatePulse();
+
             this.applyHighlightStyle(undefined); 
             console.log('Application initialized successfully.');
         } catch (error) {
             console.error("Failed to initialize the application:", error);
         }
+    }
+
+    // --- PULSE ANIMATION FUNCTION ---
+    // This runs a continuous loop to animate the radius/opacity
+    animatePulse() {
+        const duration = 2000; // 2 seconds per beat
+        let start = null;
+
+        const frame = (time) => {
+            if (!start) start = time;
+            const progress = (time - start) % duration;
+            const t = progress / duration; // 0 to 1
+
+            // 1. Expanding Wave (Yellow Ring)
+            // Radius: 8px -> 25px
+            // Opacity: 0.8 -> 0 (Fades out)
+            const radius = 8 + (17 * t);
+            const opacity = 0.8 * (1 - t);
+
+            if (this.map.getLayer('sites_fouilles-waves')) {
+                this.map.setPaintProperty('sites_fouilles-waves', 'circle-radius', radius);
+                this.map.setPaintProperty('sites_fouilles-waves', 'circle-opacity', opacity);
+            }
+
+            // 2. Breathing Core (Yellow Glow)
+            // Radius: 6px -> 9px -> 6px
+            const pulseRadius = 6 + (3 * Math.sin(t * Math.PI)); 
+            if (this.map.getLayer('sites_fouilles-pulse')) {
+                 this.map.setPaintProperty('sites_fouilles-pulse', 'circle-radius', pulseRadius);
+            }
+
+            requestAnimationFrame(frame);
+        };
+
+        requestAnimationFrame(frame);
     }
 
     initLanguageSwitcher() {
@@ -74,7 +112,6 @@ export class App {
                 if (this.filterCollection) {
                     await this.filterCollection.initFilters();
                     
-                    // REBUILD UI
                     buildFilterUI(this.filterCollection.getFilters());
                     this.initEventListeners();
 
@@ -152,11 +189,8 @@ export class App {
         );
     }
 
-    // --- FIX 1: Update Layer Visibility Logic ---
     toggleLayerVisibility(layerId, isVisible) { 
         this.map.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none'); 
-        
-        // If the user toggles 'emprises-fill', also toggle 'emprises-line'
         if (layerId === 'emprises-fill') {
             if (this.map.getLayer('emprises-line')) {
                 this.map.setLayoutProperty('emprises-line', 'visibility', isVisible ? 'visible' : 'none');
@@ -240,15 +274,23 @@ export class App {
                 const fid = feature.id;
                 const sourceId = feature.layer.source;
                 const sourceLayer = feature.layer['source-layer'];
+                
                 if (this.hoveredFid !== fid) {
                     if (this.hoveredFid !== null) {
                         this.map.setFeatureState({ source: sourceId, sourceLayer: sourceLayer, id: this.hoveredFid }, { hover: false });
                     }
                     this.hoveredFid = fid;
                     this.map.setFeatureState({ source: sourceId, sourceLayer: sourceLayer, id: fid }, { hover: true });
+
+                    // --- SHOW PULSE ONLY FOR HOVERED POINT ---
+                    // This sets a filter so the animated layers only render at the specific FID
+                    const filter = ['==', ['id'], fid];
+                    if (this.map.getLayer('sites_fouilles-pulse')) this.map.setFilter('sites_fouilles-pulse', filter);
+                    if (this.map.getLayer('sites_fouilles-waves')) this.map.setFilter('sites_fouilles-waves', filter);
                 }
             }
         });
+
         this.map.on('mouseleave', 'sites_fouilles-points', () => {
             if (this.hoveredFid !== null) {
                 const layers = this.map.getStyle().layers;
@@ -257,6 +299,12 @@ export class App {
                     this.map.setFeatureState({ source: layer.source, sourceLayer: layer['source-layer'], id: this.hoveredFid }, { hover: false });
                 }
                 this.hoveredFid = null;
+
+                // --- HIDE PULSE ---
+                // Reset filter to match nothing so it disappears
+                const filter = ['==', ['id'], ''];
+                if (this.map.getLayer('sites_fouilles-pulse')) this.map.setFilter('sites_fouilles-pulse', filter);
+                if (this.map.getLayer('sites_fouilles-waves')) this.map.setFilter('sites_fouilles-waves', filter);
             }
         });
     }
@@ -306,7 +354,6 @@ export class App {
 
             const siteLabel = `${translations.get('pop-site')} ${fid}`;
             const tkaczow = data.details.num_tkaczow ? `${translations.get('pop-tkaczow')} ${data.details.num_tkaczow}` : '';
-            
             let mainTitle = '';
             if (data.details.label && data.details.label.trim() !== '' && data.details.label !== `Site ${fid}`) {
                 mainTitle = data.details.label;
@@ -336,7 +383,7 @@ export class App {
                             <h5 class="section-title">${translations.get('pop-vestiges')}</h5>
                             ${groupedVestiges.length > 0 ? `
                                 <ul>
-                                    ${groupedVestiges.map(g => `<li><strong>${g.type}</strong>${g.text.replace(g.type, '')}</li>`).join('')}
+                                    ${groupedVestiges.map(g => `<li>${g.type}${g.text.replace(g.type, '')}</li>`).join('')}
                                 </ul>
                             ` : `<p class="no-data">${translations.get('pop-unknown')}</p>`}
                         </div>
