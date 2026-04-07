@@ -8,16 +8,74 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
+
+    /* --- DROPDOWN MENU --- */
+  .dropdown {
+      position: relative;
+      display: inline-block;
+  }
+  .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #ffffff;
+      min-width: 220px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+      z-index: 2000;
+      border-radius: 4px;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: left;
+      border-top: 3px solid #2c3e50;
+  }
+  /* Show dropdown on hover */
+  .dropdown:hover .dropdown-content {
+      display: flex;
+      flex-direction: column;
+  }
+  .dropdown-content a, .dropdown-content span.disabled-link {
+      color: #555;
+      padding: 12px 20px;
+      text-decoration: none;
+      display: block;
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: none; /* Keep text normal, not uppercase */
+  }
+  .dropdown-content a:hover {
+      background-color: #f1f1f1;
+      color: #007bff;
+  }
+  .dropdown-content span.disabled-link {
+      color: #aaa;
+      cursor: not-allowed;
+      background-color: #fafafa;
+  }
+  .soon-badge {
+      font-size: 0.65rem;
+      color: white;
+      background: #e74c3c;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: 8px;
+      vertical-align: top;
+      text-transform: uppercase;
+  }
+  /* Dropdown caret icon */
+  .caret-down {
+      font-size: 0.8em;
+      margin-left: 4px;
+  }
+
   /* =========================================
      CRITICAL OVERRIDES (Fixes Layout Issues)
      ========================================= */
-  /* These force the page to scroll and layout correctly, 
-     overriding the 'map.css' settings that break the home page. */
   
   html, body {
       height: auto !important;
       min-height: 100vh !important;
-      overflow-y: auto !important; /* ENABLES SCROLLING */
+      overflow-y: auto !important; 
       overflow-x: hidden !important;
       position: static !important;
   }
@@ -30,6 +88,10 @@
       color: #333;
       line-height: 1.8;
   }
+
+  /* --- LANGUAGE TOGGLE CLASSES --- */
+  body.fr .lang-en { display: none !important; }
+  body.en .lang-fr { display: none !important; }
 
   .wrapper {
       display: flex;
@@ -44,8 +106,6 @@
       background-color: rgba(255, 255, 255, 0.95);
       border-bottom: 1px solid rgba(0,0,0,0.05);
       padding: 15px 40px;
-      
-      /* FIX: Relative ensures it pushes content down, never covering it */
       position: relative !important; 
       z-index: 1000;
   }
@@ -127,9 +187,9 @@
       color: #2c3e50;
       padding: 10px;
   }
-  /* --- MAIN CONTENT (FIXED) --- */
+  
+  /* --- MAIN CONTENT --- */
   main {
-      /* FIX: Reset position so it flows naturally below header */
       position: relative !important; 
       top: auto !important;
       left: auto !important;
@@ -145,6 +205,28 @@
       border-radius: 8px;
   }
 
+  /* --- FLAG SWITCHER --- */
+  .lang-switcher {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      align-items: center;
+  }
+
+  .lang-flag {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      object-fit: cover;
+      border: 2px solid transparent;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .lang-flag:hover { transform: scale(1.1); }
+  .lang-flag.active { border-color: #2c3e50; }
+
   /* TEXT ALIGNMENT */
   main p {
       opacity: 0; 
@@ -152,7 +234,7 @@
       margin-bottom: 25px;
       font-size: 1.05rem;
       color: #444;
-      text-align: justify; /* Clean desktop edges */
+      text-align: justify;
   }
 
   @keyframes fadeUp {
@@ -160,10 +242,10 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  main p:nth-child(1) { animation-delay: 0.1s; }
-  main p:nth-child(2) { animation-delay: 0.25s; }
-  main p:nth-child(3) { animation-delay: 0.4s; }
-  main p:nth-child(4) { animation-delay: 0.55s; }
+  main p:nth-child(2) { animation-delay: 0.1s; }
+  main p:nth-child(3) { animation-delay: 0.25s; }
+  main p:nth-child(4) { animation-delay: 0.4s; }
+  main p:nth-child(5) { animation-delay: 0.55s; }
 
   main a {
       color: #4b61f3;
@@ -198,16 +280,9 @@
      MOBILE RESPONSIVE (Max 768px)
      ========================================= */
   @media screen and (max-width: 768px) {
-    header {
-      padding: 15px 20px;
-      text-align: center;
-    }
+    header { padding: 15px 20px; text-align: center; }
 
-    .logo-title-wrapper {
-      margin-left: 0; 
-      align-items: center; 
-      width: 100%;
-    }
+    .logo-title-wrapper { margin-left: 0; align-items: center; width: 100%; }
 
     .logo-title-wrapper img { height: 80px; }
     .site-title h1 { font-size: 1em; }
@@ -215,64 +290,38 @@
     nav { padding: 10px 20px; }
     
     .nav-container { 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        width: 100%;
+        display: flex; flex-direction: column; align-items: center; width: 100%;
     }
 
     /* Hamburger */
     .nav-logo { 
-        display: block; 
-        align-self: flex-end; 
-        position: absolute;
-        top: 0;
-        right: 0;
-        z-index: 1100;
+        display: block; align-self: flex-end; position: absolute;
+        top: 0; right: 0; z-index: 1100;
     }
 
     /* Menu Links */
     .nav-links {
-      display: none; 
-      flex-direction: column;
-      width: 100%;
-      background: #fff;
-      border-top: 1px solid #eee;
-      margin-top: 15px;
+      display: none; flex-direction: column; width: 100%;
+      background: #fff; border-top: 1px solid #eee; margin-top: 15px;
     }
 
     .nav-links.show { display: flex; }
 
     .nav-links a { 
-        margin: 0;
-        padding: 15px;
-        border-bottom: 1px solid #f5f5f5;
-        width: 100%;
-        display: block;
+        margin: 0; padding: 15px; border-bottom: 1px solid #f5f5f5; width: 100%; display: block;
     }
 
     /* Main Content Mobile */
-    main {
-      padding: 30px 20px;
-      margin: 20px 15px; 
-      width: auto !important; /* Ensure override */
-      box-shadow: none;
-      background: white; 
-    }
+    main { padding: 30px 20px; margin: 20px 15px; width: auto !important; box-shadow: none; background: white; }
     
-    /* FIX: Center Text on Mobile */
-    main p {
-        text-align: center; 
-        font-size: 1rem;
-    }
+    main p { text-align: left; font-size: 1rem; }
   }
 
   .goog-te-banner-frame, .goog-te-balloon-frame { display: none !important; }
   </style>
 </head>
 
-<body>
-  <script>
+<body class="fr"> <script>
   document.addEventListener("DOMContentLoaded", function () {
     if (document.body.style.top) document.body.style.top = "0px";
   });
@@ -294,32 +343,99 @@
         <div class="nav-logo">☰</div> 
         
         <div class="nav-links" id="mobileMenu">
-          <a href="index.html">Présentation</a>
-          <a href="https://www.cealex.org/le-cealex/" target="_blank">Le CEAlex</a>
-          <a href="/carte" id="link-carte">Carte</a>
-          <a href="/bibliography">Bibliography</a>
+          <a href="index.html" class="lang-fr">Présentation</a>
+          <a href="https://www.cealex.org/le-cealex/" target="_blank" class="lang-fr">Le CEAlex</a>
+          
+          <div class="dropdown lang-fr">
+              <a href="#" class="nav-link">Cartes <span class="caret-down">▼</span></a>
+              <div class="dropdown-content">
+                  <a href="/carte/alex" class="link-carte">Alexandrie</a>
+                  <span class="disabled-link">Mariout <span class="soon-badge">Bientôt</span></span>
+              </div>
+          </div>
+          
+          <a href="/bibliographie" class="lang-fr">Bibliographie</a>
+
+          <a href="index.html" class="lang-en">Presentation</a>
+          <a href="https://www.cealex.org/le-cealex/" target="_blank" class="lang-en">CEAlex</a>
+          
+          <div class="dropdown lang-en">
+              <a href="#" class="nav-link">Maps <span class="caret-down">▼</span></a>
+              <div class="dropdown-content">
+                  <a href="/maps/alex" class="link-carte">Alexandria</a>
+                  <span class="disabled-link">Mariout <span class="soon-badge">Soon</span></span>
+              </div>
+          </div>
+          
+          <a href="/bibliographie" class="lang-en">Bibliography</a>
         </div>
       </div>
     </nav>
 
     <main>
-      <p>Cette nouvelle plateforme est destinée à devenir le portail central des ressources cartographiques relatives à Alexandrie et à sa région. Il intégrera à terme le catalogue de la cartothèque du CEAlex ainsi que l’ensemble des projets de recherche basés sur la modélisation et la représentation spatiale.</p>
+      <div class="lang-switcher">
+        <img src="https://flagcdn.com/w80/fr.png" class="lang-flag active" id="btn-fr" alt="Français" title="Français">
+        <img src="https://flagcdn.com/w80/gb.png" class="lang-flag" id="btn-en" alt="English" title="English">
+      </div>
 
-      <p>Pour son inauguration, le portail met en ligne la Carte Archéologique d’Alexandrie. Ce projet scientifique est une première version, mais il intègre déjà une quantité importante des découvertes archéologiques faites dans la ville en s’appuyant notamment sur le travail majeur effectué par B. Tkaczow. Ce système d’information géographique (SIG) intègre divers fonds de carte géoréférencés, notamment la carte historique de Mahmoud bey el-Falaki (1866), la carte archéologique d’Achille Adriani (1934), les plans de Barbara Tkaczow (1993) et le cadastre alexandrin provenant du Survey of Egypt (1933-1948). Il offrira à terme plus de cartes géoréférencées et d’autres découvertes archéologiques, notamment celles des nécropoles alexandrines.</p>
+      <div class="lang-fr">
+          <p>Cette nouvelle plateforme est destinée à devenir le portail central des ressources cartographiques relatives à Alexandrie et à sa région. Il intégrera à terme le catalogue de la cartothèque du CEAlex ainsi que l’ensemble des projets de recherche basés sur la modélisation et la représentation spatiale.</p>
 
-      <p>La réalisation de cette infrastructure numérique est le fruit d'une collaboration pluridisciplinaire au sein du CEAlex. Les travaux de modélisation initiale ont été établis par Mathias Cunault (stage - Université François Rabelais, Tours) dès 2011, alors que l’implémentation d’un premier Web-SIG avait été menée par Aubin Bettiol (stage – ENSG). Le projet a ensuite bénéficié d’un travail approfondi mené par <a href="https://www.cealex.org/le-cealex/annuaire/filippo-mi/" target="_blank">Filippo Mi</a> sur l’extension et la correction des données archéologiques. <a href="https://www.cealex.org/le-cealex/annuaire/cs/" target="_blank">Cécile Shaalan</a> (Responsable du service Cartographie et Topographie) et Vincent Razanajao (Responsable des Humanités Numériques) ont collaboré à la supervision de ce projet. Le développement de l’outil a été assuré par le service informatique du CEAlex, avec l’engagement de <a href="https://www.cealex.org/le-cealex/annuaire/kmohsen/" target="_blank">Kamal Mohsen</a> (Responsable du service Informatique), <strong>Mustafa Morsi</strong>, et <strong>Ezz El-Din Ahmed</strong>, et plus généralement, de l’ensemble de l’équipe institutionnelle.</p>
+          <p>Pour son inauguration, le portail met en ligne la Carte Archéologique d’Alexandrie. Ce projet scientifique est une première version, mais il intègre déjà une quantité importante des découvertes archéologiques faites dans la ville en s’appuyant notamment sur le travail majeur effectué par B. Tkaczow. Ce système d’information géographique (SIG) intègre divers fonds de carte géoréférencés, notamment la carte historique de Mahmoud bey el-Falaki (1866), la carte archéologique d’Achille Adriani (1934), les plans de Barbara Tkaczow (1993) et le cadastre alexandrin provenant du Survey of Egypt (1933-1948). Il offrira à terme plus de cartes géoréférencées et d’autres découvertes archéologiques, notamment celles des nécropoles alexandrines.</p>
 
-      <p>Ce nouvel outil constitue une ressource essentielle pour la recherche archéologique et la valorisation du patrimoine d’Alexandrie.</p>
+          <p>La réalisation de cette infrastructure numérique est le fruit d'une collaboration pluridisciplinaire au sein du CEAlex. Les travaux de modélisation initiale ont été établis par Mathias Cunault (stage - Université François Rabelais, Tours) dès 2011, alors que l’implémentation d’un premier Web-SIG avait été menée par Aubin Bettiol (stage – ENSG). Le projet a ensuite bénéficié d’un travail approfondi mené par <a href="https://www.cealex.org/le-cealex/annuaire/filippo-mi/" target="_blank">Filippo Mi</a> sur l’extension et la correction des données archéologiques. <a href="https://www.cealex.org/le-cealex/annuaire/cs/" target="_blank">Cécile Shaalan</a> (Responsable du service Cartographie et Topographie) et Vincent Razanajao (Responsable des Humanités Numériques) ont collaboré à la supervision de ce projet. Le développement de l’outil a été assuré par le service informatique du CEAlex, avec l’engagement de <a href="https://www.cealex.org/le-cealex/annuaire/kmohsen/" target="_blank">Kamal Mohsen</a> (Responsable du service Informatique), <strong>Mustafa Morsi</strong>, et <strong>Ezz El-Din Ahmed</strong>, et plus généralement, de l’ensemble de l’équipe institutionnelle.</p>
+
+          <p>Ce nouvel outil constitue une ressource essentielle pour la recherche archéologique et la valorisation du patrimoine d’Alexandrie.</p>
+      </div>
+
+      <div class="lang-en">
+          <p>This new platform is designed to become the central portal for cartographic resources related to Alexandria and its region. It will ultimately integrate the CEAlex map library catalog as well as all research projects based on spatial modeling and representation.</p>
+
+          <p>For its inauguration, the portal brings online the Archaeological Map of Alexandria. This scientific project is an initial version, but it already incorporates a significant amount of archaeological discoveries made in the city, relying notably on the major work carried out by B. Tkaczow. This Geographic Information System (GIS) integrates various georeferenced base maps, including the historical map of Mahmoud bey el-Falaki (1866), the archaeological map of Achille Adriani (1934), the plans of Barbara Tkaczow (1993), and the Alexandrian cadastre from the Survey of Egypt (1933-1948). It will eventually offer more georeferenced maps and additional archaeological discoveries, particularly those of the Alexandrian necropolises.</p>
+
+          <p>The creation of this digital infrastructure is the result of a multidisciplinary collaboration within the CEAlex. The initial modeling work was established by Mathias Cunault (internship - Université François Rabelais, Tours) in 2011, while the implementation of a first Web-GIS was led by Aubin Bettiol (internship - ENSG). The project subsequently benefited from in-depth work conducted by <a href="https://www.cealex.org/le-cealex/annuaire/filippo-mi/" target="_blank">Filippo Mi</a> on the expansion and correction of archaeological data. <a href="https://www.cealex.org/le-cealex/annuaire/cs/" target="_blank">Cécile Shaalan</a> (Head of the Cartography and Topography Department) and Vincent Razanajao (Head of Digital Humanities) collaborated on the supervision of this project. The development of the tool was carried out by the CEAlex IT department, with the commitment of <a href="https://www.cealex.org/le-cealex/annuaire/kmohsen/" target="_blank">Kamal Mohsen</a> (Head of the IT Department), <strong>Mustafa Morsi</strong>, and <strong>Ezz El-Din Ahmed</strong>, and more generally, the entire institutional team.</p>
+
+          <p>This new tool constitutes an essential resource for archaeological research and the promotion of Alexandria's heritage.</p>
+      </div>
     </main>
 
     <footer>
-      <em>&copy; 2026 Centre d'Études Alexandrines – <a href="https://www.cealex.org/mentions-legales/" target="_blank">Mentions légales</a></em>
+      <em class="lang-fr">&copy; 2026 Centre d'Études Alexandrines – <a href="https://www.cealex.org/mentions-legales/" target="_blank">Mentions légales</a></em>
+      <em class="lang-en">&copy; 2026 Centre d'Études Alexandrines – <a href="https://www.cealex.org/mentions-legales/" target="_blank">Legal Notice</a></em>
     </footer>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // 1. Mobile Menu Toggle
+        const btnFr = document.getElementById('btn-fr');
+        const btnEn = document.getElementById('btn-en');
+        const body = document.body;
+
+        // دالة بتغير اللغة وبتحفظها في الـ Local Storage
+        function setLang(lang) {
+            if (lang === 'en') {
+                body.className = 'en';
+                btnEn.classList.add('active');
+                btnFr.classList.remove('active');
+                document.documentElement.lang = 'en';
+            } else {
+                body.className = 'fr';
+                btnFr.classList.add('active');
+                btnEn.classList.remove('active');
+                document.documentElement.lang = 'fr';
+            }
+            localStorage.setItem('cartalex_lang', lang);
+        }
+
+        // لما اليوزر يدوس على الزراير
+        btnFr.addEventListener('click', () => setLang('fr'));
+        btnEn.addEventListener('click', () => setLang('en'));
+
+        // أول ما الصفحة تفتح، نقرا اللغة من الذاكرة (ولو مفيش نعتبره فرنساوي)
+        const savedLang = localStorage.getItem('cartalex_lang') || 'fr';
+        setLang(savedLang);
+
+        // 2. Mobile Menu Toggle
         const navLogo = document.querySelector('.nav-logo');
         const mobileMenu = document.getElementById('mobileMenu');
 
@@ -335,19 +451,7 @@
                 }
             });
         }
-
-        // 2. Smart Link Redirect (Mobile vs Desktop)
-        var isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        var mapLink = document.getElementById('link-carte');
-        
-        // Change this line in your Smart Link Logic
-      if (isMobileDevice) {
-         mapLink.href = "/mobile.html"; // Use a leading slash to stay at root
-      } else {
-          mapLink.href = "/carte"; 
-        }
-      });
-            
+    });
   </script>
 </body>
 </html>

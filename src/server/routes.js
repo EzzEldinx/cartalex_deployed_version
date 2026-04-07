@@ -11,9 +11,40 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const CACHE_FILE = path.join(__dirname, 'zotero_cache.json');
 
+// --- HELPER: Detect Mobile Device ---
+function isMobile(req) {
+    const ua = req.get('User-Agent') || '';
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+}
+
 // --- PAGE ROUTES ---
 router.get('/', (req, res) => res.render('index.html'));
-router.get('/bibliography', (req, res) => res.render('zotero.html'));
+router.get('/bibliographie', (req, res) => res.render('zotero.html'));
+
+// --- SMART ROUTING FOR MAPS (Alexandria & Multi-Language) ---
+// Handles: /carte/alex, /carte/alex/11, /map/alex, /map/alex/11
+router.get(['/carte/alex', '/carte/alex/:fid(\\d+)', '/maps/alex', '/maps/alex/:fid(\\d+)'], (req, res) => {
+    if (isMobile(req)) {
+        res.render('mobile.html');
+    } else {
+        res.render('map.html');
+    }
+});
+
+// Explicit route for mobile.html if needed
+router.get('/mobile.html', (req, res) => res.render('mobile.html'));
+
+// --- FALLBACK/REDIRECT FOR OLD LINKS ---
+// If someone visits the old /carte or /carte/11, redirect them to /carte/alex
+router.get(['/carte', '/carte/:fid(\\d+)'], (req, res) => {
+    const fid = req.params.fid;
+    if (fid) {
+        res.redirect(`/carte/alex/${fid}`);
+    } else {
+        res.redirect('/carte/alex');
+    }
+});
+
 
 const ZOTERO_GROUP_ID = 6259582;
 
@@ -43,7 +74,7 @@ function loadCacheFromDisk() {
             const data = JSON.parse(raw);
             if (data.items) { CACHE.items = data.items; CACHE.collections = data.collections || []; CACHE.lastUpdated = data.lastUpdated; }
         }
-    } catch (err) { console.error("⚠️ Disk cache empty."); }
+    } catch (err) { console.error("⚠️ Disk cache empty or invalid."); }
 }
 
 function saveCacheToDisk() {
@@ -58,18 +89,26 @@ async function updateZoteroCache() {
     if (CACHE.isUpdating) return;
     CACHE.isUpdating = true;
     let fetchedItems = [];
+    console.log("🔄 Starting Zotero Cache Update...");
     try {
         const headers = { 'User-Agent': 'Cartalex-App/1.0' };
         let start = 0, limit = 50, hasMore = true;
         while (hasMore) {
             const res = await fetch(`https://api.zotero.org/groups/${ZOTERO_GROUP_ID}/items?format=json&include=bib,data&limit=${limit}&start=${start}&sort=creator&direction=asc`, { headers });
-            if (!res.ok) break; 
+            if (!res.ok) {
+                console.error(`❌ Zotero API Error: ${res.status} ${res.statusText}`);
+                break; 
+            }
             const batch = await res.json();
             fetchedItems = fetchedItems.concat(batch);
             if (batch.length < limit) hasMore = false;
             else { start += limit; await sleep(1500); }
         }
-        if (fetchedItems.length > 0) { CACHE.items = sortZoteroItems(fetchedItems); saveCacheToDisk(); }
+        if (fetchedItems.length > 0) { 
+            CACHE.items = sortZoteroItems(fetchedItems); 
+            saveCacheToDisk(); 
+            console.log(`✅ Zotero Cache Updated: ${fetchedItems.length} items.`);
+        }
     } catch (err) { console.error("❌ Cache Error:", err.message); } finally { CACHE.isUpdating = false; }
 }
 
@@ -78,8 +117,21 @@ updateZoteroCache();
 setInterval(updateZoteroCache, 3600000); 
 
 router.get('/zotero-collections', (req, res) => res.json(CACHE.collections || []));
+
 router.get('/zotero-api', async (req, res) => {
     const { collectionKey } = req.query;
+
+    if (CACHE.items.length === 0 && !CACHE.isUpdating) {
+        console.log("⚠️ Cache empty on request, forcing update...");
+        await updateZoteroCache();
+    }
+
+    let attempts = 0;
+    while (CACHE.isUpdating && attempts < 20) { 
+        await sleep(500);
+        attempts++;
+    }
+
     if (CACHE.items.length > 0) {
         let resItems = CACHE.items;
         if (collectionKey && collectionKey !== 'all') {
@@ -87,32 +139,30 @@ router.get('/zotero-api', async (req, res) => {
         }
         return res.json(resItems);
     }
-    res.status(500).json({ error: "Cache empty." });
+
+    res.status(500).json({ error: "Cache empty. Zotero API might be down or unreachable." });
 });
 
-router.get('/carte/:fid(\\d+)', (req, res) => res.render('map.html'));
-router.get('/carte', (req, res) => res.render('map.html'));
 
-// --- SITE DETAILS (FIXED: Underscores for Bibliography + Label Safe Mode) ---
+// --- SITE DETAILS (UPDATED: Fetch Coordinates for Deep Linking) ---
 router.get('/sitesFouilles/:fid/details', async (req, res, next) => {
     const { fid } = req.params;
     
     try {
-        // Safe Mode: Forces labelFr since labelEn is missing in local DB
         const details = await db.oneOrNone(`
             SELECT sf.id, sf.num_tkaczow, sf.commentaire, 
-            sf."labelFr" as label 
+            sf."labelFr" as label,
+            ST_X(ST_Transform(sf.geom, 4326)) as lng, 
+            ST_Y(ST_Transform(sf.geom, 4326)) as lat
             FROM public.sites_fouilles AS sf 
             WHERE sf.fid = $1;
         `, [fid]);
 
         if (!details) return res.status(404).json({ error: 'Site not found' });
         
-        // Sub-tables: defaulting to labelFr where applicable
         const discoveries = await db.any(`SELECT p.nom AS inventeur, d.date_decouverte, dt."labelFr" as type_decouverte FROM public.decouvertes AS d LEFT JOIN public.personnes AS p ON d.id_inventeur = p.id LEFT JOIN public.discovery_types AS dt ON d.type = dt.id WHERE d.fid_site = $1 ORDER BY d.date_decouverte ASC;`, [fid]);
         const vestiges = await db.any(`SELECT c."labelFr" as caracterisation, p."labelFr" as periode FROM public.vestiges v JOIN public.caracterisations c ON v.id_caracterisation = c.id LEFT JOIN public.datations d ON v.id = d.id_vestige LEFT JOIN public.periodes p ON d.id_periode = p.id WHERE v.fid_site = $1;`, [fid]);
         
-        // FIX: Replaced "Publication Title" with "Publication_Title" (and others) to match DB schema
         const bibliographies = await db.any(`
             SELECT b."Title" as title, b."Author" as author, b."Date" as date, 
             b."Publication_Title" as publication_title, 
@@ -134,7 +184,6 @@ router.get('/getValues/:tableName', cacheMiddleware, addOrderAliasOnSelectDistin
     const field = req.query.field;
     let dbquery = "";
 
-    // Defaulting to labelFr for safety
     if (tableName === 'vestiges') {
         if (field === 'caracterisation') {
             dbquery = `SELECT DISTINCT c.caracterisation, c."labelFr" AS label FROM public.vestiges v JOIN public.caracterisations c ON v.id_caracterisation = c.id ORDER BY label`;

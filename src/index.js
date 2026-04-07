@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     attribution: 'Tiles &copy; Esri' 
                 },
                 /* تم تصحيح الروابط هنا لتشير للدومين بدلاً من localhost */
-                tegola_points: { type: 'vector', tiles: ['http://maps.cealex.org:8080/maps/cartalex/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
-                pgts_parcelles_region: { type: 'vector', tiles: ['http://maps.cealex.org:7800/public.parcelles_region/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
-                pgts_emprises: { type: 'vector', tiles: ['http://maps.cealex.org:7800/public.emprises/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
-                pgts_littoral: { type: 'vector', tiles: ['http://maps.cealex.org:7800/public.littoral/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+                tegola_points: { type: 'vector', tiles: ['http://localhost:8080/maps/cartalex/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+                pgts_parcelles_region: { type: 'vector', tiles: ['http://localhost:7800/public.parcelles_region/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+                pgts_emprises: { type: 'vector', tiles: ['http://localhost:7800/public.emprises/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+                pgts_littoral: { type: 'vector', tiles: ['http://localhost:7800/public.littoral/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
                 "plan-adriani": { type: "raster", tiles: ["/adriani/{z}/{x}/{y}.png"], tileSize: 256, attribution: "Plan d'Adriani, 1934" },
                 "plan-tkaczow": { type: "raster", tiles: ["/tkaczow/{z}/{x}/{y}.png"], tileSize: 256, attribution: "Plan de Tkaczow, 1993" },
                 "plan-falaky":  { type: "raster", tiles: ["/falaky/{z}/{x}/{y}.png"],  tileSize: 256, attribution: "Restitution de Mahmoud Bey el-Falaki, 1866" },
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 { id: "Plan de Tkaczow, 1993", type: "raster", source: "plan-tkaczow", layout: { "visibility": "none" } },
                 { id: "Restitution de Mahmoud bey el-Falaki, 1866",  type: "raster", source: "plan-falaky",  layout: { "visibility": "none" } },
                 { id: 'emprises-fill', type: 'fill', source: 'pgts_emprises', 'source-layer': 'public.emprises', layout: { 'visibility': 'none' }, paint: { 'fill-color': 'rgba(255, 255, 255, 0.6)' } },
-                { id: 'emprises-line', type: 'line', source: 'pgts_emprises', 'source-layer': 'public.emprises', layout: { 'visibility': 'none' }, paint: { 'line-color': 'rgba(153, 9, 182, 0.6)', 'line-width': 2.5 }, metadata: { 'filter-ui': 'ignore' } },
+                { id: 'emprises-line', type: 'line', source: 'pgts_emprises', 'source-layer': 'public.emprises', layout: { 'visibility': 'none' }, paint: { 'line-color': 'rgba(155, 0, 245, 0.6)', 'line-width': 2.5 }, metadata: { 'filter-ui': 'ignore' } },
                 { id: 'littoral-line', type: 'line', source: 'pgts_littoral', 'source-layer': 'public.littoral', layout: { 'visibility': 'none' }, paint: { 'line-color': 'rgb(78, 152, 215)', 'line-width': 4 } },
                 { id: 'parcelles_region-fill', type: 'fill', source: 'pgts_parcelles_region', 'source-layer': 'public.parcelles_region', layout: { 'visibility': 'none' }, paint: { 'fill-color': 'rgba(255, 255, 255, 0.6)', 'fill-outline-color': '#4E98D7' } },
                 { id: 'sites_fouilles-waves', type: 'circle', source: 'tegola_points', 'source-layer': 'sites_fouilles', paint: { 'circle-radius': 8, 'circle-radius-transition': { duration: 0 }, 'circle-opacity-transition': { duration: 0 }, 'circle-color': 'rgb(251, 255, 0)', 'circle-stroke-color': 'yellow', 'circle-stroke-width': 4 }, filter: ['==', ['id'], ''], metadata: { 'filter-ui': 'ignore' } },

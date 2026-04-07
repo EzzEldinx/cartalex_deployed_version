@@ -1,9 +1,17 @@
-/**
- * Translation Manager
- * Handles switching between French and English
- */
+// 1. تحديد اللغة بناءً على اللينك أولاً، ثم الذاكرة، ثم الافتراضي
+let initialLang = 'fr';
+const currentPath = window.location.pathname;
+
+if (currentPath.includes('/maps/')) {
+    initialLang = 'en';
+} else if (currentPath.includes('/carte/')) {
+    initialLang = 'fr';
+} else {
+    initialLang = localStorage.getItem('cartalex_lang') || 'fr';
+}
+
 export const translations = {
-    currentLang: 'fr', // Default language
+    currentLang: initialLang,
 
     dictionary: {
         // --- TOOLS & BUTTONS ---
@@ -153,6 +161,7 @@ export const translations = {
 
     toggle() {
         this.currentLang = this.currentLang === 'fr' ? 'en' : 'fr';
+        localStorage.setItem('cartalex_lang', this.currentLang); // السطر ده اللي زاد
         this.apply();
         return this.currentLang;
     },

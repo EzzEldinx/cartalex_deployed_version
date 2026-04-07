@@ -30,12 +30,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 
                 // --- TEGOLA SOURCE (POINTS) ---
-                tegola_points: { type: 'vector', tiles: ['http://localhost:8080/maps/cartalex/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+                tegola_points: { type: 'vector', tiles: ['https://maps.cealex.org/maps/cartalex/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
 
                 // --- PG_TILESERV SOURCES ---
-                pgts_parcelles_region: { type: 'vector', tiles: ['http://localhost:7800/public.parcelles_region/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
-                pgts_emprises: { type: 'vector', tiles: ['http://localhost:7800/public.emprises/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
-                pgts_littoral: { type: 'vector', tiles: ['http://localhost:7800/public.littoral/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+                pgts_parcelles_region: { type: 'vector', tiles: ['https://maps.cealex.org/public.parcelles_region/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+                pgts_emprises: { type: 'vector', tiles: ['https://maps.cealex.org/public.emprises/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
+                pgts_littoral: { type: 'vector', tiles: ['https://maps.cealex.org/public.littoral/{z}/{x}/{y}.pbf'], minzoom: 0, maxzoom: 22 },
 
                 // --- HISTORICAL MAP SOURCES ---
                 "plan-adriani": { type: "raster", tiles: ["/adriani/{z}/{x}/{y}.png"], tileSize: 256, attribution: "Plan d'Adriani, 1934" },

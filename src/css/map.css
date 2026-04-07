@@ -201,3 +201,64 @@
     #volet_gauche { left: 0; right: 0; bottom: 0; top: auto; height: 40vh; width: 100%; transform: translateY(100%); border-radius: 14px 14px 0 0; background: rgba(15, 25, 28, 0.97); }
     #volet_gauche.is-open { transform: translateY(0); }
   }
+
+  /* =========================================
+   MAP CREDITS (SINGLE LINE & BOTTOM ATTACHED)
+   ========================================= */
+#map-credits {
+  position: absolute !important;
+  bottom: 0 !important; /* لزقناه في أرضية الشاشة بالظبط */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: max-content !important;
+  max-width: 95% !important;
+  background-color: #ffffff !important; 
+  border: 1px solid #cccccc !important; 
+  border-bottom: none !important; /* شلنا الحد السفلي عشان لازق تحت */
+  padding: 6px 16px !important;
+  border-radius: 8px 8px 0 0 !important; /* الدوران من فوق بس */
+  z-index: 9999 !important; 
+  pointer-events: none !important;
+  box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.1) !important; /* الضل بيرمي لفوق */
+  text-align: center !important;
+}
+
+#map-credits ul {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: row !important; /* الكلام كله في سطر واحد */
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: wrap !important; /* عشان لو الموبايل ضيق جداً */
+}
+
+#map-credits li {
+  font-family: 'Open Sans', sans-serif !important;
+  font-weight: 400 !important; /* شلنا الـ Bold */
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  color: #1a1a1a !important; 
+}
+
+/* التريكة: إضافة علامة | بين الكلمتين بالمسافات بتاعتها */
+#map-credits li:nth-child(2)::before {
+  content: "|";
+  margin-left: 8px !important;
+  margin-right: 8px !important;
+  color: #888 !important; /* لون العلامة بهتان سنة عشان الشياكة */
+}
+
+/* تظبيط الموبايل */
+@media (max-width: 768px) {
+  #map-credits {
+      padding: 4px 10px !important;
+      width: 100% !important; /* في الموبايل ممكن نخليه ياخد العرض كله لو حابب، أو تسيبها max-content */
+      border-radius: 0 !important; /* نلغي الدوران في الموبايل عشان يبقى شريط كامل */
+  }
+  #map-credits li {
+      font-size: 10px !important; 
+  }
+}

@@ -1,5 +1,6 @@
 const express = require('express');
-const fetch = require('node-fetch');
+//const fetch = require('node-fetch');
+const response = await fetch(url);
 const app = express();
 
 const GROUP_ID = 6259582;

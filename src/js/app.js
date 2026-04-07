@@ -44,7 +44,6 @@ export class App {
             this.initDistanceMeasure();
             this.initLanguageSwitcher(); 
             
-            // --- FIX: START PULSE ANIMATION HERE ---
             this.animatePulse();
 
             this.applyHighlightStyle(undefined); 
@@ -54,20 +53,14 @@ export class App {
         }
     }
 
-    // --- PULSE ANIMATION FUNCTION ---
-    // This runs a continuous loop to animate the radius/opacity
     animatePulse() {
-        const duration = 2000; // 2 seconds per beat
+        const duration = 2000; 
         let start = null;
-
         const frame = (time) => {
             if (!start) start = time;
             const progress = (time - start) % duration;
-            const t = progress / duration; // 0 to 1
+            const t = progress / duration; 
 
-            // 1. Expanding Wave (Yellow Ring)
-            // Radius: 8px -> 25px
-            // Opacity: 0.8 -> 0 (Fades out)
             const radius = 8 + (17 * t);
             const opacity = 0.8 * (1 - t);
 
@@ -76,16 +69,12 @@ export class App {
                 this.map.setPaintProperty('sites_fouilles-waves', 'circle-opacity', opacity);
             }
 
-            // 2. Breathing Core (Yellow Glow)
-            // Radius: 6px -> 9px -> 6px
             const pulseRadius = 6 + (3 * Math.sin(t * Math.PI)); 
             if (this.map.getLayer('sites_fouilles-pulse')) {
                  this.map.setPaintProperty('sites_fouilles-pulse', 'circle-radius', pulseRadius);
             }
-
             requestAnimationFrame(frame);
         };
-
         requestAnimationFrame(frame);
     }
 
@@ -109,6 +98,19 @@ export class App {
                 const newLang = translations.toggle();
                 this.updateLanguageUI(newLang);
                 
+                // --- FIX: Update the URL bar immediately when language changes ---
+                const currentPath = window.location.pathname;
+                let newPath = currentPath;
+                if (newLang === 'en' && currentPath.includes('/carte/alex')) {
+                    newPath = currentPath.replace('/carte/alex', '/maps/alex');
+                } else if (newLang === 'fr' && currentPath.includes('/maps/alex')) {
+                    newPath = currentPath.replace('/maps/alex', '/carte/alex');
+                }
+                if (newPath !== currentPath) {
+                    window.history.replaceState({}, '', newPath);
+                }
+                // ---------------------------------------------------------------
+
                 if (this.filterCollection) {
                     await this.filterCollection.initFilters();
                     
@@ -237,24 +239,31 @@ export class App {
     }
 
     initDeepLinkHandlers() {
-        const pathMatch = window.location.pathname.match(/\/carte\/(\d+)/);
-        if (pathMatch && pathMatch[1]) this.focusPointByFid(pathMatch[1]);
+        const pathMatch = window.location.pathname.match(/\/(carte|maps)\/alex\/(\d+)/);
+        if (pathMatch && pathMatch[2]) this.focusPointByFid(pathMatch[2]);
+        
         window.addEventListener('popstate', () => {
-            const popPathMatch = window.location.pathname.match(/\/carte\/(\d+)/);
-            if (popPathMatch && popPathMatch[1]) this.focusPointByFid(popPathMatch[1]);
+            const popPathMatch = window.location.pathname.match(/\/(carte|maps)\/alex\/(\d+)/);
+            if (popPathMatch && popPathMatch[2]) this.focusPointByFid(popPathMatch[2]);
             else if (this.popup) { this.popup.remove(); this.popup = null; }
         });
     }
 
+    // --- FIX: Use current language state instead of pathname to set URL correctly ---
     updateUrlForPoint(fid) {
-        const url = new URL(`${window.location.origin}/carte/${fid}`);
+        const isEnglish = translations.currentLang === 'en';
+        const base = isEnglish ? '/maps/alex' : '/carte/alex';
+        const url = new URL(`${window.location.origin}${base}/${fid}`);
         window.history.pushState({}, '', url);
     }
 
     resetUrl() {
-        const url = new URL(`${window.location.origin}/carte`);
+        const isEnglish = translations.currentLang === 'en';
+        const base = isEnglish ? '/maps/alex' : '/carte/alex';
+        const url = new URL(`${window.location.origin}${base}`);
         window.history.pushState({}, '', url);
     }
+    // ------------------------------------------------------------------------------
 
     flyToCoordinates(coordinates, { zoom = 16, duration = 1000, padding = {} } = {}) {
         this.map.flyTo({ center: coordinates, zoom, duration, padding, curve: 1.6, easing: (t) => 1 - Math.pow(1 - t, 2) });
@@ -263,8 +272,16 @@ export class App {
     async focusPointByFid(fid) {
         try {
             const response = await fetch(`${server_config.api_at}/sitesFouilles/${fid}/details`);
+            if (!response.ok) return;
             const data = await response.json();
-        } catch (e) { console.error(e); }
+
+            if (data.details && data.details.lng && data.details.lat) {
+                const coords = [data.details.lng, data.details.lat];
+                
+                this.flyToCoordinates(coords, { zoom: 17, duration: 1500 });
+                this.showPopupForSite(fid, coords);
+            }
+        } catch (e) { console.error("Deep link error:", e); }
     }
 
     initHoverEffect() {
@@ -282,8 +299,6 @@ export class App {
                     this.hoveredFid = fid;
                     this.map.setFeatureState({ source: sourceId, sourceLayer: sourceLayer, id: fid }, { hover: true });
 
-                    // --- SHOW PULSE ONLY FOR HOVERED POINT ---
-                    // This sets a filter so the animated layers only render at the specific FID
                     const filter = ['==', ['id'], fid];
                     if (this.map.getLayer('sites_fouilles-pulse')) this.map.setFilter('sites_fouilles-pulse', filter);
                     if (this.map.getLayer('sites_fouilles-waves')) this.map.setFilter('sites_fouilles-waves', filter);
@@ -300,8 +315,6 @@ export class App {
                 }
                 this.hoveredFid = null;
 
-                // --- HIDE PULSE ---
-                // Reset filter to match nothing so it disappears
                 const filter = ['==', ['id'], ''];
                 if (this.map.getLayer('sites_fouilles-pulse')) this.map.setFilter('sites_fouilles-pulse', filter);
                 if (this.map.getLayer('sites_fouilles-waves')) this.map.setFilter('sites_fouilles-waves', filter);
@@ -361,6 +374,25 @@ export class App {
 
             const groupedVestiges = this.groupVestiges(data.vestiges);
 
+            let groupedDiscoveriesHTML = '';
+            if (data.discoveries && data.discoveries.length > 0) {
+                const discoveriesByType = {};
+                
+                data.discoveries.forEach(d => {
+                    const type = translations.get(d.type_decouverte);
+                    if (!discoveriesByType[type]) discoveriesByType[type] = [];
+                    const detailText = `${d.inventeur}, ${d.date_decouverte || '?'}`;
+                    discoveriesByType[type].push(detailText);
+                });
+
+                groupedDiscoveriesHTML = '<ul>' + Object.keys(discoveriesByType).map(type => {
+                    const details = discoveriesByType[type].join('; ');
+                    return `<li>${type} (${details})</li>`;
+                }).join('') + '</ul>';
+            } else {
+                groupedDiscoveriesHTML = `<p class="no-data">${translations.get('pop-no-discovery')}</p>`;
+            }
+
             let html = `
                 <div class="site-popup">
                     <h4>
@@ -371,13 +403,7 @@ export class App {
                         ${mainTitle ? `<h3 class="site-label-big">${mainTitle}</h3>` : ''}
                         <div class="section-popup">
                             <h5 class="section-title">${translations.get('pop-decouvertes')}</h5>
-                            ${data.discoveries && data.discoveries.length > 0 ? `
-                                <ul>
-                                    ${data.discoveries.map(d => `
-                                        <li>${translations.get(d.type_decouverte)} (${d.inventeur}, ${d.date_decouverte || '?'})</li>
-                                    `).join('')}
-                                </ul>
-                            ` : `<p class="no-data">${translations.get('pop-no-discovery')}</p>`}
+                            ${groupedDiscoveriesHTML}
                         </div>
                         <div class="section-popup">
                             <h5 class="section-title">${translations.get('pop-vestiges')}</h5>
@@ -397,7 +423,6 @@ export class App {
                                         const date = b.date || '';
                                         const pages = this.formatPages(b.pages);
                                         const place = b.place || '';
-                                        const publisher = b.publisher || '';
                                         const title = b.title || '';
                                         const pubTitle = b.publication_title || '';
                                         const url = b.url ? `<a href="${b.url}" target="_blank" style="text-decoration:none; margin-left:4px;">&#8599;</a>` : '';
@@ -406,7 +431,7 @@ export class App {
                                         } else if (b.item_type === 'bookSection') {
                                             citation = `${author}, «\u00A0${title}\u00A0», <em>${pubTitle}</em>, ${place}, ${date}, ${pages}.`;
                                         } else if (b.item_type === 'thesis') {
-                                            citation = `${author}, ${title}, ${translations.get('pop-thesis')} ${publisher}, ${place}, ${date}, ${pages}.`;
+                                            citation = `${author}, ${title}, ${translations.get('pop-thesis')} ${b.publisher || ''}, ${place}, ${date}, ${pages}.`;
                                         } else if (b.item_type === 'webpage' || b.item_type === 'blogPost') {
                                             const access = b.access_date ? `, ${translations.get('pop-consulted')} ${b.access_date}` : '';
                                             citation = `${author}, «\u00A0${title}\u00A0», <em>${pubTitle}</em>${access} ${translations.get('pop-at-address')} ${b.url || ''}.`;
